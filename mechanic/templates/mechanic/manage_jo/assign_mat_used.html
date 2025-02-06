@@ -1,0 +1,227 @@
+{% extends 'mechanic/index.html' %}
+
+{% block content %}
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<style>
+    .header-section {
+        background-color: #294FA2;
+        color: white;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        border-radius: 7px 7px 0 0;
+    }
+
+    .header-section h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 24px;
+        margin: 0;
+    }
+
+    .btn-primary {
+        background-color: #2d6fa0;
+        color: white;
+        border: none;
+        font-family: 'Montserrat', sans-serif;
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #1e4b82;
+        transform: scale(1.05);
+    }
+
+    .btn-secondary {
+        background-color: #888;
+        color: white;
+        border: none;
+        font-family: 'Montserrat', sans-serif;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: not-allowed;
+    }
+
+    .content-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 0 0 7px 7px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    h3 {
+        color: #294FA2;
+        margin-bottom: 20px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .table th,
+    .table td {
+        padding: 12px;
+        border: 1px solid #ddd;
+    }
+
+    .table th {
+        background-color: #2d6fa0;
+        color: white;
+        font-weight: bold;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .alert {
+        font-family: 'Montserrat', sans-serif;
+        margin-top: 10px;
+    }
+
+    .no-data {
+        text-align: center;
+        color: #888;
+        font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+        .header-section {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .table {
+            font-size: 12px;
+        }
+
+        .btn-primary {
+            font-size: 12px;
+            padding: 8px 15px;
+        }
+    }
+</style>
+
+<!-- Header Section -->
+<div class="header-section">
+    <h1>Assign Material Used</h1>
+</div>
+
+<!-- Content Section -->
+<div class="content-section">
+    {% if messages %}
+        <div id="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <h3>Item Request Details</h3>
+    <p><strong>Item Req No.:</strong> {{ item_request.item_req_num }}</p>
+    {% if job_order %}
+        <p><strong>Job Order Number:</strong> {{ job_order.j_o_number }}</p>
+        <p><strong>Description:</strong> {{ item_request.item_req_description }}</p>
+    {% else %}
+        <p>No job order assigned.</p>
+    {% endif %}
+    <p><strong>Date Requested:</strong> {{ item_request.item_req_date_requested }}</p>
+    <p><strong>Status:</strong> {{ item_request.item_req_status }}</p>
+
+    {% if materials %}
+        <h3>Materials Requested</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Material Code</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Brand</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in materials %}
+                <tr>
+                    <td>{{ material.mat_code.mat_code }}</td>
+                    <td>{{ material.mat_code.mat_name }}</td>
+                    <td>{{ material.mat_req_qty }}</td>
+                    <td>{{ material.mat_code.mat_brand }}</td>
+                    <td>{{ material.mat_req_status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if material_orders %}
+        <h3>Material Orders</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Brand</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in material_orders %}
+                <tr>
+                    <td>{{ order.mat_odr_id }}</td>
+                    <td>{{ order.mat_odr_name }}</td>
+                    <td>{{ order.mat_odr_qty }}</td>
+                    <td>{{ order.mat_odr_brand }}</td>
+                    <td>{{ order.mat_category.mat_name }}</td>
+                    <td>{{ order.mat_odr_status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <div style="margin-top: 20px;">
+        {% if assignable_materials or assignable_orders %}
+        <form method="post" action="{% url 'mechanic:assign_material_to_job_order' item_request.item_req_num %}" onsubmit="this.querySelector('button').disabled = true;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Assign Material</button>
+        </form>
+        {% else %}
+            <button class="btn btn-secondary" disabled>Assigned</button>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn btn-secondary" onclick="history.back()">Back</button>
+    </div>
+</div>
+
+<script>
+    const messages = document.getElementById('messages');
+    if (messages) {
+        setTimeout(() => {
+            window.location.href = "{% url 'mechanic:joborder_list' %}";
+        }, 3000);
+    }
+</script>
+
+{% endblock %}

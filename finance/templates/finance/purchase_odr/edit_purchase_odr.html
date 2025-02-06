@@ -1,38 +1,158 @@
 {% extends 'finance/base.html' %}
 
 {% block content %}
-<div style="background-color: #294FA2; height: 150px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
-    <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">Edit Purchase Order</h1>
+<head>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<style>
+    /* Header Section */
+    .header-container {
+        background-color: #294FA2;
+        height: 150px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        border-radius: 7px 7px 0 0;
+        padding: 0 20px;
+    }
+
+    .header-title {
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 32px;
+        font-weight: 500;
+    }
+
+    /* Form Container */
+    .form-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 7px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    /* Buttons */
+    .btn-primary, .btn-success, .btn-secondary, .btn-danger {
+        font-family: 'Roboto', sans-serif;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-success {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: #45a049;
+    }
+
+    .btn-danger {
+        background-color: red;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: darkred;
+    }
+
+    /* Card Style */
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Material Section */
+    .material-card {
+        margin-bottom: 15px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        background-color: #f9f9f9;
+    }
+
+    .material-card p {
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
+        margin: 5px 0;
+    }
+
+    .material-card hr {
+        margin: 10px 0;
+    }
+
+    .no-materials {
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
+        color: #888;
+    }
+</style>
+
+<!-- Header Section -->
+<div class="header-container">
+    <h1 class="header-title">Edit Purchase Order</h1>
 </div>
 
-<div class="container mt-4">
+<!-- Form Section -->
+<div class="form-container">
     <form method="post">
         {% csrf_token %}
+
+        <!-- Purchase Order Details -->
         <h3>Purchase Order Details</h3>
-        <div class="card p-4 mb-4">
+        <div class="card">
             {{ form.as_p }}
         </div>
 
         <!-- Save and Cancel Buttons -->
-        <div style="margin-top: 20px;">
-            <button type="submit" class="btn btn-success" style="padding: 10px 20px;">Save Changes</button>
-            <a href="{% url 'finance:purchase_odr' %}" class="btn btn-danger" style="padding: 10px 20px;">Cancel</a>
+        <div class="d-flex justify-content-start mt-3">
+            <button type="submit" class="btn btn-success me-3">Save Changes</button>
+            <a href="{% url 'finance:purchase_odr' %}" class="btn btn-danger">Cancel</a>
         </div>
     </form>
 
+    <!-- Materials Section -->
     <h3 style="margin-top: 30px;">Item(s) in this Purchase Order</h3>
-    <div class="card p-4 mb-4">
+    <div class="card">
         {% for material in related_materials %}
-            <div class="mb-3">
+            <div class="material-card">
                 <p><strong>Material Name:</strong> {{ material.mat_odr_name }}</p>
                 <p><strong>Quantity:</strong> {{ material.mat_odr_qty }}</p>
                 <p><strong>Brand:</strong> {{ material.mat_odr_brand }}</p>
                 <p><strong>Measurement / Size:</strong> {{ material.mat_odr_measurement }}</p>
-                
+                <p><strong>Category:</strong> {{ material.mat_category.mat_name }}</p>
                 <hr>
             </div>
         {% empty %}
-            <p>No materials found for this purchase order.</p>
+            <p class="no-materials">No materials found for this purchase order.</p>
         {% endfor %}
     </div>
 </div>

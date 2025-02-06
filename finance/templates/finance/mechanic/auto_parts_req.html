@@ -2,11 +2,12 @@
 
 {% block content %}
 <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
-    <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">ITEM REQUEST</h1>
+    <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">AUTO PART(S) REQUEST</h1>
 </div>
 
-<!-- Table for materials -->
-<div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+<!-- Table for Material Requests -->
+<div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 30px;">
+    <h3 style="margin-left: 20px;">Material Requests</h3>
     <table style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
             <tr style="border: 1px solid #000; font-family: 'Alice', regular; font-size: 20px;">
@@ -33,7 +34,7 @@
                 <td>{{ item.mat_code.mat_name }}</td>
                 <td>{{ item.mat_req_qty }}</td>
                 <td>{{ item.mat_code.mat_brand }}</td>
-                <td>{{ item.mat_code.mat_measurement }}</td>
+                <td>{{ item.mat_code.mat_measurement | default:"N/A" }}</td>
                 <td>{{ item.mat_code.mat_category.mat_name }}</td>
                 <td>{{ item.mat_req_status }}</td>
                 <td>
@@ -45,13 +46,67 @@
                     <!-- Deny Button -->
                     <button onclick="denyMaterial('{{ item.mat_req_id }}')"
                         style="background-color: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
-                        Deny
+                        Decline
                     </button>
                 </td>
             </tr>
             {% empty %}
             <tr>
                 <td colspan="11" style="text-align: center;">No Auto Parts Item Requests Available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Table for Material Orders -->
+<div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h3 style="margin-left: 20px;">Material Orders</h3>
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="border: 1px solid #000; font-family: 'Alice', regular; font-size: 20px;">
+                <th>Item Req No.</th>
+                <th>Bus Unit No.</th>
+                <th>Approved By</th>
+                <th>Description</th>
+                <th>Material Name</th>
+                <th>Quantity</th>
+                <th>Brand</th>
+                <th>Measurements</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in material_orders %}
+            <tr id="row-{{ order.mat_odr_id }}" style="font-family: 'Istok Web', sans-serif; font-size: 18px;">
+                <td>{{ order.item_req_num.item_req_num }}</td>
+                <td>{{ order.item_req_num.bus_unit_num.bus_unit_num }}</td>
+                <td>{{ order.item_req_num.item_req_approved_by.emp_fname }} {{ order.item_req_num.item_req_approved_by.emp_lname }}</td>
+                <td>{{ order.item_req_num.item_req_description }}</td>
+                <td>{{ order.mat_odr_name }}</td>
+                <td>{{ order.mat_odr_qty }}</td>
+                <td>{{ order.mat_odr_brand|default:"N/A" }}</td>
+                <td>{{ order.mat_odr_measurement|default:"N/A" }}</td>
+                <td>{{ order.mat_category.mat_name }}</td>
+                <td>{{ order.mat_odr_status }}</td>
+                <td>
+                    <!-- Approve Button -->
+                    <button onclick="approveMaterialOrder('{{ order.mat_odr_id }}')"
+                        style="background-color: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                        Approve
+                    </button>
+                    <!-- Deny Button -->
+                    <button onclick="denyMaterialOrder('{{ order.mat_odr_id }}')"
+                        style="background-color: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                        Decline
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="11" style="text-align: center;">No Material Orders Available</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -75,7 +130,6 @@ function approveMaterial(matReqId) {
                 const row = document.getElementById(`row-${matReqId}`);
                 if (row) {
                     row.cells[9].innerText = 'Approved';
-                    row.remove();
                 }
                 alert("Material approved successfully!");
             } else {
@@ -87,6 +141,89 @@ function approveMaterial(matReqId) {
         });
     }
 }
-</script>
 
+function denyMaterial(matReqId) {
+    if (confirm("Are you sure you want to deny this item?")) {
+        const url = "{% url 'finance:deny_material' 0 %}".replace('/0/', `/${matReqId}/`);
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = document.getElementById(`row-${matReqId}`);
+                if (row) {
+                    row.cells[9].innerText = 'Denied';
+                }
+                alert("Material denied successfully!");
+            } else {
+                alert("Failed to deny material: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            alert("An error occurred: " + error.message);
+        });
+    }
+}
+
+function approveMaterialOrder(matOdrId) {
+    if (confirm("Are you sure you want to approve this material order?")) {
+        const url = "{% url 'finance:approve_material_order' 0 %}".replace('/0/', `/${matOdrId}/`);
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = document.getElementById(`row-${matOdrId}`);
+                if (row) {
+                    row.cells[9].innerText = 'Approved';  // Update the status cell
+                }
+                alert("Material order approved successfully!");
+            } else {
+                alert("Failed to approve material order: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            alert("An error occurred: " + error.message);
+        });
+    }
+}
+
+function denyMaterialOrder(matOdrId) {
+    if (confirm("Are you sure you want to deny this material order?")) {
+        const url = "{% url 'finance:decline_material_order' 0 %}".replace('/0/', `/${matOdrId}/`);
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = document.getElementById(`row-${matOdrId}`);
+                if (row) {
+                    row.cells[9].innerText = 'Denied';  // Update the status cell
+                }
+                alert("Material order denied successfully!");
+            } else {
+                alert("Failed to deny material order: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            alert("An error occurred: " + error.message);
+        });
+    }
+}
+</script>
 {% endblock %}

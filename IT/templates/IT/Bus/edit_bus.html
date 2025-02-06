@@ -1,58 +1,51 @@
 {% extends 'IT/index.html' %}
 {% load static %}
 {% block content %}
+    <!-- Font and Icons Links -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <!-- Header Section -->
-    <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
-        <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">{% if edit_mode %}Edit Bus{% else %}Add Bus{% endif %}</h1>
-    </div>
-
-    <!-- Success and Error Messages -->
-    <div style="max-width: 900px; margin: 40px auto;">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        {% if form.errors %}
-            <div class="alert alert-danger" role="alert">
-                Please correct the errors below.
-            </div>
-        {% endif %}
+    <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative; padding: 0 20px;">
+        <h1 style="color: white; margin-left: 20px; font-family: 'Montserrat', sans-serif; font-size: 32px; text-transform: uppercase;">
+            {% if edit_mode %}
+                Edit Bus
+            {% else %}
+                Add Bus
+            {% endif %}
+        </h1>
     </div>
 
     <!-- Form Container -->
-    <div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px; max-width: 900px; margin: 40px auto; border-radius: 7px;">
+    <div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 40px; max-width: 900px; margin: 40px auto; border-radius: 7px;">
         <!-- Add/Edit Bus Form -->
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-
+        
             <fieldset>
-                <legend>Bus Information</legend>
-
+                <legend>Bus Information: {{ bus.bus_unit_num }}</legend>
+        
                 <div class="row">
                     {% for field in form %}
                         {% if field.name == "bus_unit_num" and edit_mode %}
-                            <!-- Skip Bus Unit Number field in edit mode -->
+                            <!-- Render hidden input for bus_unit_num when in edit mode -->
+                            <input type="hidden" name="{{ field.name }}" value="{{ field.value }}">
                         {% else %}
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="{{ field.id_for_label }}" class="form-label mt-4">{{ field.label }}</label>
                                     {{ field }}
+                                    {% if field.errors %}
+                                        <div class="text-danger mt-2">
+                                            {{ field.errors|join:"<br>" }}
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            </div>
-                        {% endif %}
-                        
-                        {% if field.errors %}
-                            <div class="text-danger">
-                                {{ field.errors }}
                             </div>
                         {% endif %}
                     {% endfor %}
                 </div>
-
+        
                 <!-- Submit Button -->
                 <div class="form-group text-center mt-4">
                     <button type="submit" class="btn btn-primary btn-lg">
@@ -64,7 +57,9 @@
 
         <!-- Back to Bus List -->
         <div class="text-center mt-4">
-            <a href="{% url 'it:bus' %}" class="btn btn-secondary btn-lg">Back to Bus</a>
+            <a href="{% url 'it:bus' %}" class="btn btn-secondary btn-lg" style="width: 250px; padding: 12px; font-size: 18px; border-radius: 7px;">
+                <i class="bi bi-arrow-left-circle" style="margin-right: 8px;"></i>Back to Bus
+            </a>
         </div>
     </div>
 {% endblock %}

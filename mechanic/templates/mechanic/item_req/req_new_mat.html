@@ -1,0 +1,145 @@
+{% extends 'mechanic/index.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Request Materials for Job Order: {{ job_order_num }}</h1>
+    <form id="item-request-form" method="POST">
+        {% csrf_token %}
+
+        <div class="form-group mt-3">
+            <label for="bus_unit_num">Bus Unit</label>
+            <input type="text" id="bus_unit_num" class="form-control" value="{{ bus_unit_num }}" readonly>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="description">Description</label>
+            <textarea id="description" name="item_req_description" class="form-control" placeholder="Enter description"></textarea>
+        </div>
+
+        <hr>
+
+        <h3>Request New Material</h3>
+        <div class="form-group mt-3">
+            <label for="mat_odr_name">Material Name</label>
+            <input type="text" id="mat_odr_name" name="mat_odr_name" class="form-control">
+        </div>
+        <div class="form-group mt-3">
+            <label for="mat_odr_qty">Quantity</label>
+            <input type="number" id="mat_odr_qty" name="mat_odr_qty" class="form-control">
+        </div>
+        <div class="form-group mt-3">
+            <label for="mat_odr_brand">Brand</label>
+            <input type="text" id="mat_odr_brand" name="mat_odr_brand" class="form-control">
+        </div>
+        <div class="form-group mt-3">
+            <label for="mat_odr_measurement">Measurement</label>
+            <input type="text" id="mat_odr_measurement" name="mat_odr_measurement" class="form-control">
+        </div>
+        <div class="form-group mt-3">
+            <label for="mat_category">Material Category</label>
+            <select id="mat_category" name="mat_category" class="form-control">
+                <option value="">Select a category</option>
+                {% for category in categories %}
+                    <option value="{{ category.mat_category_id }}">{{ category.mat_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="button" id="add-material-btn" class="btn btn-success mt-3">Add to Table</button> 
+
+        <h3 class="mt-4">Requested Materials</h3>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Material Name</th>
+                    <th>Quantity</th>
+                    <th>Brand</th>
+                    <th>Measurement</th>
+                    <th>Material Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="materials-table">
+                <!-- Dynamically added rows will appear here -->
+            </tbody>
+        </table>
+
+        <!-- Hidden input to store requested materials -->
+        <input type="hidden" id="materials-data" name="materials">
+
+        <button type="submit" class="btn btn-primary mt-3">Submit Request</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const addMaterialBtn = document.querySelector("#add-material-btn");
+        const materialsTable = document.querySelector("#materials-table");
+        const materialsInput = document.querySelector("#materials-data");
+
+        // Store requested materials
+        let requestedMaterials = [];
+
+        // Add material to the table
+        addMaterialBtn.addEventListener("click", () => {
+            const matName = document.querySelector("#mat_odr_name").value.trim();
+            const matQty = document.querySelector("#mat_odr_qty").value.trim();
+            const matBrand = document.querySelector("#mat_odr_brand").value.trim() || "Generic";
+            const matMeasurement = document.querySelector("#mat_odr_measurement").value.trim();
+            const matCategoryId = document.querySelector("#mat_category").value;
+            const matCategoryName = document.querySelector(`#mat_category option[value="${matCategoryId}"]`).textContent;
+
+            if (!matName || !matQty || !matCategoryId) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+
+            // Add row to the table
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${matName}</td>
+                <td>${matQty}</td>
+                <td>${matBrand}</td>
+                <td>${matMeasurement}</td>
+                <td>${matCategoryName}</td>
+                <td><button type="button" class="btn btn-danger btn-sm remove-btn">Remove</button></td>
+            `;
+            materialsTable.appendChild(row);
+
+            // Update requested materials list
+            requestedMaterials.push({
+                name: matName,
+                quantity: matQty,
+                brand: matBrand,
+                measurement: matMeasurement,
+                category_id: matCategoryId,
+                category_name: matCategoryName,
+            });
+
+            // Update hidden input value
+            materialsInput.value = JSON.stringify(requestedMaterials);
+
+            // Clear input fields
+            document.querySelector("#mat_odr_name").value = "";
+            document.querySelector("#mat_odr_qty").value = "";
+            document.querySelector("#mat_odr_brand").value = "";
+            document.querySelector("#mat_odr_measurement").value = "";
+            document.querySelector("#mat_category").value = "";
+
+            // Add event listener for remove button
+            row.querySelector(".remove-btn").addEventListener("click", () => {
+                row.remove();
+                requestedMaterials = requestedMaterials.filter(
+                    (item) =>
+                        item.name !== matName ||
+                        item.quantity !== matQty ||
+                        item.brand !== matBrand ||
+                        item.measurement !== matMeasurement
+                );
+                materialsInput.value = JSON.stringify(requestedMaterials);
+            });
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends 'mechanic/index.html' %}
+
+{% block content %}
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<style>
+    .header-section {
+        background-color: #294FA2;
+        color: white;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        border-radius: 7px 7px 0 0;
+    }
+
+    .header-section h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 24px;
+        margin: 0;
+    }
+
+    .btn-primary {
+        background-color: #2d6fa0;
+        color: white;
+        border: none;
+        font-family: 'Montserrat', sans-serif;
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #1e4b82;
+        transform: scale(1.05);
+    }
+
+    .content-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 0 0 7px 7px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    h3 {
+        color: #294FA2;
+        margin-bottom: 20px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .table th,
+    .table td {
+        padding: 12px;
+        border: 1px solid #ddd;
+    }
+
+    .table th {
+        background-color: #2d6fa0;
+        color: white;
+        font-weight: bold;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .alert {
+        font-family: 'Montserrat', sans-serif;
+        margin-top: 10px;
+    }
+
+    .no-data {
+        text-align: center;
+        color: #888;
+        font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+        .header-section {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .table {
+            font-size: 12px;
+        }
+
+        .btn-primary {
+            font-size: 12px;
+            padding: 8px 15px;
+        }
+    }
+</style>
+
+<div class="header-section">
+    <h1>Item Requests</h1>
+</div>
+
+<div class="content-section">
+    <form method="GET" action="">
+        <div class="form-group">
+            <label for="mat_odr_name">Filter by Material Name</label>
+            <input type="text" id="mat_odr_name" name="mat_odr_name" class="form-control" value="{{ mat_odr_name_filter }}" placeholder="Enter material name">
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Filter</button>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item Req No.</th>
+                <th>Bus Unit No.</th>
+                <th>J.O No.</th>
+                <th>Approved By</th>
+                <th>Description</th>
+                <th>Date Requested</th>
+                <th>Status</th>
+                <th>View</th>
+                <th>Assign J.O</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item_req_num, data in grouped_material_orders.items %}
+            <tr>
+                <td>{{ item_req_num.item_req_num }}</td>
+                <td>{{ item_req_num.bus_unit_num }}</td>
+                <td>{% if item_req_num.job_order %}{{ item_req_num.job_order.j_o_number }}{% else %}N/A{% endif %}</td>
+                <td>{% if data.item_req_approved_by %}{{ data.item_req_approved_by }}{% else %}N/A{% endif %}</td>
+                <td>{{ item_req_num.item_req_description }}</td>
+                <td>{{ item_req_num.item_req_date_requested }}</td>
+                <td>{{ item_req_num.item_req_status }}</td>
+                <td>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modal{{ item_req_num.item_req_num }}">
+                        View
+                    </button>
+                </td>
+                <td>
+                    <a href="{% url 'mechanic:assign_mat_used' item_req_num=item_req_num.item_req_num %}" class="btn btn-primary">Assign Material</a>
+                </td>
+            </tr>
+
+            <div class="modal fade" id="modal{{ item_req_num.item_req_num }}" tabindex="-1" aria-labelledby="modalLabel{{ item_req_num.item_req_num }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel{{ item_req_num.item_req_num }}">Material Orders for Item Request #{{ item_req_num.item_req_num }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% for material in data.materials %}
+                            <p><strong>Material ID:</strong> {{ material.mat_odr_id }}</p>
+                            <p><strong>Material Name:</strong> {{ material.mat_odr_name }}</p>
+                            <p><strong>Quantity:</strong> {{ material.mat_odr_qty }}</p>
+                            <p><strong>Brand:</strong> {{ material.mat_odr_brand }}</p>
+                            <p><strong>Measurement:</strong> {{ material.mat_odr_measurement }}</p>
+                            <p><strong>Category:</strong> {{ material.mat_category.mat_name }}</p>
+                            <p><strong>Status:</strong> {{ material.mat_odr_status }}</p>
+                            <hr>
+                            {% endfor %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -1,179 +1,19 @@
-/* Header Styling */
+/* base.css */
 .header {
     background-color: #294FA2;
-    height: 80px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    border-radius: 7px 7px 0 0;
 }
 
 .header h1 {
     color: white;
-    font-family: 'Istok Web', sans-serif;
-    margin: 0;
+    font-size: 32px;
 }
 
-.header .actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.form-header {
-    background-color: #294FA2;
-    padding: 10px 20px;
-    color: white;
-    border-radius: 7px 7px 0 0;
-}
-
-.form-header h1 {
-    font-size: 24px;
-    margin: 0;
-}
-
-.form-container {
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 0 0 7px 7px;
-    max-width: 600px;
-    margin: 20px auto;
-    background-color: #f9f9f9;
-}
-
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-    font-style: italic;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-.submit_btn {
-    background-color: #294FA2;
+.btn {
+    background-color: #f44336;
     color: white;
     padding: 10px 15px;
-    border: none;
     border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.submit_btn:hover {
-    background-color: #1d3a7a;
-}
-
-.cancel_btn {
-    background-color: #d9534f;
-    color: white;
-    padding: 10px 15px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-    text-align: center;
-}
-
-.cancel_btn:hover {
-    background-color: #b52e27;
-}
-
-/* Table Styling */
-.table-container table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-.table-container th,
-.table-container td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: left;
-}
-
-.table-container th {
-    background-color: #294FA2;
-    color: white;
-    font-weight: bold;
-}
-
-.table-container tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.table-container tr:hover {
-    background-color: #e6f0ff;
-}
-
-/* No Requests Message */
-.table-container td[colspan="6"] {
-    text-align: center;
-    font-style: italic;
-    color: #777;
-}
-
-/* Add Request Button Styling */
-.add_btn {
-    background-color: #007bff;
-    color: white;
-    padding: 8px 12px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-.add_btn:hover {
-    background-color: #0056b3;
-}
-
-/* Search Form Styling */
-.search_form {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.search_form input {
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.search_form .search_btn {
-    background-color: #294FA2;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.search_form .search_btn:hover {
-    background-color: #1d3a7a;
 }

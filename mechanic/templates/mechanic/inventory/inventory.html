@@ -1,63 +1,202 @@
 {% extends 'mechanic/index.html' %}
 
 {% block content %}
-<div style="background-color: #294FA2; height: 110px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
-    <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">AUTO PARTS</h1>
-    <div style="display: flex; position: absolute; bottom: 10px; right: 20px;">
-        <!-- Search bar -->
-        <form method="GET" action="{% url 'mechanic:inventory' %}">
-            <input 
-                type="text" 
-                name="search" 
-                placeholder="Search..." 
-                style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; width: 250px; height: 40px;" 
-                value="{{ search_query }}"
-            >
-            
-            <!-- Category filter dropdown -->
-            <select name="category" style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; height: 40px; margin-left: 10px;">
-                <option value="">All Categories</option>
-                {% for category in categories %}
-                    <option value="{{ category.mat_category_id }}" {% if category.mat_category_id|stringformat:"s" == selected_category %}selected{% endif %}>
-                        {{ category.mat_name }}
-                    </option>
-                {% endfor %}
-            </select>
+    <style>
+        /* Include Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600&display=swap');
 
-            <button type="submit" style="padding: 8px 15px; border-radius: 7px; background-color: #4CAF50; color: white; border: none; height: 40px; margin-left: 10px;">
-                Filter
-            </button>
-        </form>
+        /* Header Styling */
+        .header-container {
+            background-color: #294FA2;
+            height: 150px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            border-radius: 7px 7px 0 0;
+            padding-left: 20px;
+        }
+
+        .header-title {
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px;
+            font-weight: 500;
+        }
+
+        /* Filter Form Styling */
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: absolute;
+            top: 80px;
+            right: 30px;
+        }
+
+        .filter-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-input, .filter-select {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            background-color: #2d6fa0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+        }
+
+        .filter-btn i {
+            font-size: 16px;
+        }
+
+        .filter-btn:hover {
+            background-color: #467ba3;
+        }
+
+        /* Table Styling */
+        .materials-table-container {
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 7px;
+        }
+
+        .materials-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Roboto', sans-serif;
+            font-size: 15px;
+            text-align: left;
+        }
+
+        .materials-table thead tr {
+            background-color: #2d6fa0;
+            color: white;
+            border-bottom: 2px solid #D3D3D3;
+        }
+
+        .materials-table th, .materials-table td {
+            padding: 10px;
+            text-align: center;
+            border-right: 1px solid #E0E0E0;
+        }
+
+        .materials-table th:last-child, .materials-table td:last-child {
+            border-right: none;
+        }
+
+        .materials-table tbody tr {
+            border-bottom: 1px solid #E0E0E0;
+            transition: background-color 0.3s;
+        }
+
+        .materials-table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .no-data-text {
+            padding: 10px;
+            text-align: center;
+            font-style: italic;
+            color: #999;
+            background-color: #fdfdfd;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                height: auto;
+                padding: 20px;
+                text-align: center;
+            }
+
+            .filter-container {
+                flex-direction: column;
+                gap: 10px;
+                bottom: -50px;
+                right: 0;
+            }
+
+            .materials-table th, .materials-table td {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+    </style>
+
+    <!-- Header Section -->
+    <div class="header-container">
+        <h1 class="header-title">AUTO PARTS</h1>
+        <div class="filter-container">
+            <!-- Search and Category Filter Form -->
+            <form method="GET" action="{% url 'mechanic:inventory' %}" class="filter-form">
+                <input 
+                    type="text" 
+                    name="search" 
+                    placeholder="Search..." 
+                    class="filter-input"
+                    value="{{ search_query }}"
+                >
+                <select name="category" class="filter-select">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.mat_category_id }}" {% if category.mat_category_id|stringformat:"s" == selected_category %}selected{% endif %}>
+                            {{ category.mat_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="filter-btn">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- Table for materials -->
-<div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-    <table style="width: 100%; border-collapse: collapse; text-align: left;">
-        <thead>
-            <tr style="border-left: 1px solid #000; border-right: 1px solid #000; border-top: 2px solid #000; border-bottom: 1px solid #000; font-family: 'Alice', regular; font-size: 20px;">
-                <th>Item Name</th>
-                <th>Quantity</th>
-                <th>Brand</th>
-                <th>Measurement</th>
-                <th>Category</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for mats in materials %}
-            <tr style="font-family: 'Istok Web', sans-serif; font-size: 18px;">
-                <td>{{ mats.mat_name }}</td>
-                <td>{{ mats.mat_quantity }}</td>
-                <td>{{ mats.mat_brand }}</td>
-                <td>{{ mats.mat_measurement }}</td>
-                <td>{{ mats.mat_category.mat_name }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" style="text-align: center;">No Auto Parts Available</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <!-- Table for materials -->
+    <div class="materials-table-container">
+        <table class="materials-table">
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Brand</th>
+                    <th>Measurement</th>
+                    <th>Category</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mats in materials %}
+                    <tr>
+                        <td>{{ mats.mat_name }}</td>
+                        <td>{{ mats.mat_quantity }}</td>
+                        <td>{{ mats.mat_brand }}</td>
+                        <td>{{ mats.mat_measurement }}</td>
+                        <td>{{ mats.mat_category.mat_name }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="no-data-text">No Auto Parts Available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 {% endblock %}

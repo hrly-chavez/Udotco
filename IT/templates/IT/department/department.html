@@ -2,10 +2,13 @@
 {% load static %}
 
 {% block content %}
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
 
     <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: space-between; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; padding: 0 20px;">
         <!-- Title -->
-        <h1 style="color: white; font-family: 'Istok Web', sans-serif;">Department</h1>
+        <h1 style="color: white; font-family: 'Montserrat', sans-serif;">Department</h1>
         
         <!-- Add Department Button -->
         <a href="{% url 'it:add_employee' %}" 
@@ -34,7 +37,7 @@
             <div class="col">
                 <a href="{% url 'it:operational'  %}" style="text-decoration: none; color: black;">
                     <div class="card" style="height: 300px;">
-                        <img src="{% static 'images/star8.jpg' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
+                        <img src="{% static 'images/OperationalManager.png' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
                         <div class="card-body" style="height: 150px; overflow: hidden;">
                             <h5 class="card-title">Operational Manager</h5>
                         </div>
@@ -46,7 +49,7 @@
             <div class="col">
                 <a href="{% url 'it:it_dep' %}" style="text-decoration: none; color: black;">
                     <div class="card" style="height: 300px;">
-                        <img src="{% static 'images/star8.jpg' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
+                        <img src="{% static 'images/IT.png' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
                         <div class="card-body" style="height: 150px; overflow: hidden;">
                             <h5 class="card-title">I.T. Department</h5>
                         </div>
@@ -58,7 +61,7 @@
             <div class="col">
                 <a href="{% url 'it:transportation' %}" style="text-decoration: none; color: black;">
                     <div class="card" style="height: 300px;">
-                        <img src="{% static 'images/star8.jpg' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
+                        <img src="{% static 'images/Transportational.png' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
                         <div class="card-body" style="height: 150px; overflow: hidden;">
                             <h5 class="card-title">Transportation Department</h5>
                         </div>
@@ -70,7 +73,7 @@
             <div class="col">
                 <a href="{% url 'it:vm' %}" style="text-decoration: none; color: black;">
                     <div class="card" style="height: 300px;">
-                        <img src="{% static 'images/star8.jpg' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
+                        <img src="{% static 'images/VehicleMaintenance.png' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
                         <div class="card-body" style="height: 150px; overflow: hidden;">
                             <h5 class="card-title">Vehicle Maintenance Department</h5>
                         </div>
@@ -82,7 +85,7 @@
             <div class="col">
                 <a href="{% url 'it:hr' %}" style="text-decoration: none; color: black;">
                     <div class="card" style="height: 300px;">
-                        <img src="{% static 'images/star8.jpg' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
+                        <img src="{% static 'images/HR.png' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
                         <div class="card-body" style="height: 150px; overflow: hidden;">
                             <h5 class="card-title">H.R. Department</h5>
                         </div>
@@ -94,7 +97,7 @@
             <div class="col">
                 <a href="{% url 'it:finance' %}" style="text-decoration: none; color: black;">
                     <div class="card" style="height: 300px;">
-                        <img src="{% static 'images/star8.jpg' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
+                        <img src="{% static 'images/Finance.png' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
                         <div class="card-body" style="height: 150px; overflow: hidden;">
                             <h5 class="card-title">Finance Department</h5>
                         </div>
@@ -106,7 +109,7 @@
             <div class="col">
                 <a href="{% url 'it:fuel' %}" style="text-decoration: none; color: black;">
                     <div class="card" style="height: 300px;">
-                        <img src="{% static 'images/star8.jpg' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
+                        <img src="{% static 'images/Fuel.png' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
                         <div class="card-body" style="height: 150px; overflow: hidden;">
                             <h5 class="card-title">Fuel Department</h5>
                         </div>
@@ -118,7 +121,7 @@
             <div class="col">
                 <a href="{% url 'it:safety' %}" style="text-decoration: none; color: black;">
                     <div class="card" style="height: 300px;">
-                        <img src="{% static 'images/star8.jpg' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
+                        <img src="{% static 'images/Safety.png' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
                         <div class="card-body" style="height: 150px; overflow: hidden;">
                             <h5 class="card-title">Safety Department</h5>
                         </div>
@@ -130,7 +133,7 @@
             <div class="col">
                 <a href="{% url 'it:dispatch' %}" style="text-decoration: none; color: black;">
                     <div class="card" style="height: 300px;">
-                        <img src="{% static 'images/star8.jpg' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
+                        <img src="{% static 'images/Dispatch.png' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
                         <div class="card-body" style="height: 150px; overflow: hidden;">
                             <h5 class="card-title">Dispatch Department</h5>
                         </div>
@@ -142,7 +145,7 @@
             <div class="col">
                 <a href="{% url 'it:officer' %}" style="text-decoration: none; color: black;">
                     <div class="card" style="height: 300px;">
-                        <img src="{% static 'images/star8.jpg' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
+                        <img src="{% static 'images/Officers.png' %}" class="card-img-top" alt="Operational Manager" style="height: 200px; object-fit: cover;">
                         <div class="card-body" style="height: 150px; overflow: hidden;">
                             <h5 class="card-title">Officers</h5>
                         </div>
@@ -155,7 +158,7 @@
     <style>
         /* Hover effect for changing card body color and movement */
         .card:hover .card-body {
-            background-color: #007bff;
+            background-color: #2d6fa0;
             color: white;
             transition: background-color 0.3s ease, transform 0.3s ease;
             transform: translateY(-10px); /* Moves the card up */
@@ -185,14 +188,13 @@
 
         /* Button styles */
         .add-employee-btn {
-            background-color: #007bff;
+            background-color: #2d6fa0;
             color: white;
             text-decoration: none;
             padding: 15px 30px; /* Increased padding for a bigger button */
             border-radius: 10px; /* Slightly rounded corners */
-            font-family: 'Istok Web', sans-serif;
-            font-size: 18px; /* Larger font size */
-            font-weight: bold; /* Bold text */
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px; /* Larger font size */
             box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
             transition: background-color 0.3s ease, transform 0.3s ease;
             display: inline-flex;
@@ -203,7 +205,7 @@
 
         /* Hover effect */
         .add-employee-btn:hover {
-            background-color: #0056b3; /* Darker shade of blue */
+            background-color: #2a638f; /* Darker shade of blue */
             transform: scale(1.1); /* Slightly enlarge the button on hover */
             box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3); /* Adds a shadow for depth */
             color: white; /* Ensure text remains white */

@@ -3,22 +3,231 @@
 <head>
     <title>Driver Requests</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'driverstyle.css' %}">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header Container */
+        .header {
+            background-color: #294FA2;
+            height: 150px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border-radius: 7px 7px 0 0;
+            width: 100%;
+        }
+
+        .header h1 {
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px;
+            font-weight: 500;
+            margin-right: 20px;
+        }
+
+        .header .actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: -10px; 
+            padding-right: 50px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background-color: #f44336;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .add_btn {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background-color: #2d6fa0;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .add_btn:hover {
+            background-color: #4686b1;
+        }
+
+        .add_btn i {
+            margin-right: 8px;
+        }
+
+        .search_form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .search_form input[type="text"] {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+        }
+
+        .search_btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            width: 95%;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Roboto', sans-serif;
+            font-size: 15px;
+            text-align: left;
+        }
+
+        .requests-table thead tr {
+            background-color: #2d6fa0; 
+            color: #fff;
+        }
+
+        .requests-table th, .requests-table td {
+            padding: 10px;
+            border: 1px solid #E0E0E0;
+            text-align: center;
+        }
+
+        .requests-table tbody tr {
+            transition: background-color 0.3s;
+        }
+
+        .requests-table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .requests-table .empty-message {
+            font-style: italic;
+            color: gray;
+            background-color: #f9f9f9;
+        }
+
+        /* Logout Container (Left Side) */
+        .logout-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            padding-top: 85px;
+        }
+
+        .logout-container .btn {
+            background-color: #f44336;
+            color: white;
+            border-radius: 5px;
+            padding: 7px 14px;
+            text-decoration: none;
+            font-size: 15px;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-container .btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .logout-container .btn i {
+            margin-right: 8px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: center;
+                height: auto;
+                padding: 20px;
+            }
+
+            .header .actions {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+                margin-left: 0; 
+            }
+
+            .requests-table th,
+            .requests-table td {
+                font-size: 14px;
+            }
+
+            .logout-container {
+                top: 10px;
+                left: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="header">
         <h1>Driver Requests</h1>
         <div class="actions">
-            <a href="#" class="btn btn-danger" id="logoutBtn" >
-                Logout
+            <a href="{% url 'driver:add_request' %}" class="add_btn">
+                <i class="fas fa-plus"></i>Add Request
             </a>
-            <a href="{% url 'driver:add_request' %}" class="add_btn">Add Request</a>
             <form method="get" class="search_form">
                 <input type="text" name="search" placeholder="Search by Date (YYYY-MM-DD)">
-                <button type="submit" class="search_btn">Filter</button>
+                <button type="submit" class="search_btn">
+                    <i class="fas fa-search"></i>
+                </button>
             </form>
         </div>
     </div>
+
+    <!-- Logout Button on the Left Side -->
+    <div class="logout-container">
+        <a href="#" class="btn" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+
     <div class="table-container">
         <table class="requests-table">
             <thead>
@@ -40,38 +249,35 @@
                     <td>{{ req.j_o_date_requested }}</td>
                     <td>{{ req.j_o_work_description }}</td>
                     <td>{{ req.j_o_status|default:"Pending" }}</td>
+                </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6">No requests found.</td>
+                    <td class="empty-message" colspan="6">No requests found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', function(event) {
+            const confirmLogout = confirm("Are you sure you want to log out?");
+            if (!confirmLogout) {
+                event.preventDefault();
+            } else {
+                window.location.href = "{% url 'driver:logout' %}";
+            }
+        });
+
+        window.onload = function() {
+            if (!document.referrer.includes(window.location.hostname)) {
+                history.replaceState(null, null, window.location.href);
+                window.history.pushState(null, "", window.location.href);
+                window.onpopstate = function() {
+                    history.go(1);
+                };
+            }
+        };
+    </script>
 </body>
-
-<script>
-    // Add event listener to the logout button
-    document.getElementById('logoutBtn').addEventListener('click', function(event) {
-        // Show confirmation dialog
-        const confirmLogout = confirm("Are you sure you want to log out?");
-        if (!confirmLogout) {
-            event.preventDefault(); // Prevent the default action if the user cancels
-        } else {
-            // If confirmed, redirect to logout URL
-            window.location.href = "{% url 'driver:logout' %}"; // Redirect to your logout URL
-        }
-    });
-
-    // Prevent back button navigation after logout
-    window.onload = function() {
-        if (!document.referrer.includes(window.location.hostname)) {
-            history.replaceState(null, null, window.location.href);
-            window.history.pushState(null, "", window.location.href);
-            window.onpopstate = function() {
-                history.go(1); // Prevent navigating back
-            };
-        }
-    };
-</script>
 </html>

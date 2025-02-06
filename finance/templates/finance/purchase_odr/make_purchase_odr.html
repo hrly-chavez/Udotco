@@ -2,60 +2,77 @@
 
 {% block content %}
 <div style="background-color: #294FA2; height: 150px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px;">
-    <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">Create Purchase Order</h1>
+    <h1 style="color: white; margin-left: 20px;">Create Purchase Order</h1>
 </div>
 
 <div class="container mt-4">
     <form method="post">
         {% csrf_token %}
-        
+
         <!-- Purchase Order Form -->
         <h3>Purchase Order Details</h3>
         <div class="card p-4 mb-4">
-            {{ purchase_order_form.po_description.label_tag }}<br>
-            {{ purchase_order_form.po_description }}<br>
-            {{ purchase_order_form.po_datemade.label_tag }}<br>
-            {{ purchase_order_form.po_datemade }}<br>
-            {{ purchase_order_form.sup_id.label_tag }}<br>
-            {{ purchase_order_form.sup_id }}<br>
-            {{ purchase_order_form.po_approved_by.label_tag }}<br>
-            {{ purchase_order_form.po_approved_by }}
+            {{ purchase_order_form.as_p }}
         </div>
-        
-        <!-- Material Order Formset -->
-        <h3>Item(s) Order</h3>
-        <div class="card p-4 mb-4" id="material-order-formset">
-            {{ formset.management_form }}
-            {% for form in formset %}
-                <div class="form-group border p-3 mb-3 material-order-form">
-                    {{ form.as_p }}
 
-                    <!-- Display validation errors for the quantity field -->
-                    {% if form.mat_odr_qty.errors %}
-                        <div class="alert alert-danger">
-                            {% for error in form.mat_odr_qty.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
+            <!-- Material Order Formset
+            <h3>Material Orders</h3>
+            <div class="card p-4 mb-4" id="material-order-container">
+                {{ material_order_formset.management_form }}
+                <div id="formset-forms">
+                    {% for form in material_order_formset %}
+                        <div class="form-row material-order-form">
+                            {{ form.as_p }}
+                            <button type="button" class="btn btn-danger btn-sm remove-form">Remove</button>
                         </div>
-                    {% endif %}
-
-                    <!-- Always display the Remove button -->
-                    <button type="button" class="btn btn-danger btn-sm remove-material">Remove</button>
-
-                    <!-- Hide the DELETE checkbox and label -->
-                    <style>
-                        .material-order-form input[name$='-DELETE'],
-                        .material-order-form label[for$='-DELETE'] {
-                            display: none;
-                        }
-                    </style>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+                <button type="button" id="add-material-form" class="btn btn-primary mt-2">Add Material</button>
+            </div> -->
+
+
+        <!-- Material Selection -->
+        <h3>Approved Materials</h3>
+        <div class="form-group">
+            <label for="material-dropdown">Select Material:</label>
+            <select id="material-dropdown" class="form-control">
+                <option value="">-- Select Material --</option>
+                {% for material in approved_materials %}
+                    <option value="{{ material.mat_odr_id }}" 
+                            data-quantity="{{ material.mat_odr_qty }}" 
+                            data-brand="{{ material.mat_odr_brand }}" 
+                            data-measurement="{{ material.mat_odr_measurement }}" 
+                            data-category="{{ material.mat_category.mat_name }}" 
+                            data-status="{{ material.mat_odr_status }}">
+                        {{ material.mat_odr_name }} 
+                     </option><!-- Quantity: {{ material.mat_odr_qty }} -->
+                {% endfor %}
+            </select>
+            <button type="button" id="add-material" class="btn btn-primary mt-2">Add to Table</button>
         </div>
 
-        <!-- Buttons -->
-        <div class="mt-3">
-            <button type="button" id="add-material" class="btn btn-primary">Add Item</button>
+        <!-- Selected Materials Table -->
+        <h3>Selected Materials</h3>
+        <table class="table mt-3" id="selected-materials-table">
+            <thead>
+                <tr>
+                    <th>Material Name</th>
+                    <th>Quantity</th>
+                    <th>Brand</th>
+                    <th>Measurement</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <!-- Hidden Input to Store Material IDs -->
+        <input type="hidden" name="selected_materials" id="selected-materials-input">
+
+        <!-- Submit and Cancel Buttons -->
+        <div class="mt-4">
             <button type="submit" class="btn btn-success">Save Purchase Order</button>
             <a href="{% url 'finance:purchase_odr' %}" class="btn btn-secondary">Cancel</a>
         </div>
@@ -63,57 +80,130 @@
 </div>
 
 <script>
-    // Add Material button functionality
-    document.getElementById('add-material').addEventListener('click', function() {
-        const formsetDiv = document.getElementById('material-order-formset');
-        const totalForms = document.getElementById('id_form-TOTAL_FORMS');
-        const formCount = parseInt(totalForms.value, 10);
+// JavaScript for handling material selection and adding to the table
+document.addEventListener("DOMContentLoaded", function () {
+    const materialDropdown = document.getElementById("material-dropdown");
+    const addMaterialBtn = document.getElementById("add-material");
+    const materialsTable = document.getElementById("selected-materials-table").querySelector("tbody");
+    const selectedMaterialsInput = document.getElementById("selected-materials-input");
 
-        const lastForm = formsetDiv.querySelector('.material-order-form:last-child');
-        const newForm = lastForm.cloneNode(true);
+    addMaterialBtn.addEventListener("click", function () {
+        const selectedOption = materialDropdown.selectedOptions[0];
+        const materialId = selectedOption.value;
+        const materialName = selectedOption.text;
 
-        newForm.querySelectorAll('input, select, textarea').forEach(input => {
-            input.name = input.name.replace(/-(\d+)-/, `-${formCount}-`);
-            input.id = input.id.replace(/-(\d+)-/, `-${formCount}-`);
-            if (input.type !== "checkbox") {
-                input.value = '';
-            }
-            if (input.type === "checkbox") {
-                input.checked = false;
+        if (!materialId) {
+            alert("Please select a material.");
+            return;
+        }
+
+        // Check if material is already added
+        if (materialsTable.querySelector(`tr[data-id="${materialId}"]`)) {
+            alert("Material is already added.");
+            return;
+        }
+
+        // Add material to table
+        const row = document.createElement("tr");
+        row.setAttribute("data-id", materialId);
+        row.innerHTML = `
+            <td>${materialName}</td>
+            <td>${selectedOption.getAttribute('data-quantity')}</td>
+            <td>${selectedOption.getAttribute('data-brand')}</td>
+            <td>${selectedOption.getAttribute('data-measurement')}</td>
+            <td>${selectedOption.getAttribute('data-category')}</td>
+            <td>${selectedOption.getAttribute('data-status')}</td>
+            <td><button type="button" class="btn btn-danger btn-sm remove-material">Remove</button></td>
+        `;
+        materialsTable.appendChild(row);
+
+        updateSelectedMaterials();
+    });
+
+    materialsTable.addEventListener("click", function (e) {
+        if (e.target.classList.contains("remove-material")) {
+            const row = e.target.closest("tr");
+            row.remove();
+            updateSelectedMaterials();
+        }
+    });
+
+    function updateSelectedMaterials() {
+        const selectedMaterials = [];
+        materialsTable.querySelectorAll("tr").forEach(row => {
+            selectedMaterials.push(row.getAttribute("data-id"));
+        });
+
+        console.log('Selected Materials:', selectedMaterials); // Debugging output
+        selectedMaterialsInput.value = JSON.stringify(selectedMaterials);
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const formContainer = document.getElementById("formset-forms");
+    const addFormButton = document.getElementById("add-material-form");
+    const totalFormsInput = document.querySelector("#id_material_order-TOTAL_FORMS");
+
+    // Function to add a new form
+    function addForm() {
+        const formCount = parseInt(totalFormsInput.value, 10); // Current form count
+        const emptyFormTemplate = formContainer.querySelector(".material-order-form").cloneNode(true); // Clone the first form
+
+        // Clear input values and update indices
+        emptyFormTemplate.querySelectorAll("input, select").forEach((input) => {
+            const nameAttr = input.getAttribute("name");
+            if (nameAttr) {
+                const newName = nameAttr.replace(/\d+/, formCount); // Replace index
+                input.setAttribute("name", newName);
+                input.setAttribute("id", `id_${newName}`);
+                input.value = ""; // Clear the value
             }
         });
 
-        formsetDiv.appendChild(newForm);
-        totalForms.value = formCount + 1;
-    });
+        // Append the form and update the total form count
+        formContainer.appendChild(emptyFormTemplate);
+        totalFormsInput.value = formCount + 1;
 
-    // Remove Material button functionality
-    document.addEventListener('click', function(event) {
-        if (event.target.classList.contains('remove-material')) {
-            const formGroup = event.target.closest('.material-order-form');
-            const formsetDiv = document.getElementById('material-order-formset');
-            const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+        // Add event listener to the "Remove" button
+        addRemoveHandler(emptyFormTemplate);
+    }
 
-            // Find the DELETE field input and set its value to "on"
-            const deleteField = formGroup.querySelector('input[name$="-DELETE"]');
-            if (deleteField) {
-                deleteField.value = 'on';  // Mark the form for deletion
-            }
-
-            // Remove the form from the DOM
-            formGroup.remove();
-
-            // Update the form count
-            totalForms.value = parseInt(totalForms.value, 10) - 1;
-
-            Array.from(formsetDiv.querySelectorAll('.material-order-form')).forEach((form, index) => {
-                form.querySelectorAll('input, select, textarea').forEach(input => {
-                    input.name = input.name.replace(/-(\d+)-/, `-${index}-`);
-                    input.id = input.id.replace(/-(\d+)-/, `-${index}-`);
-                });
+    // Function to handle "Remove" button clicks
+    function addRemoveHandler(formElement) {
+        const removeButton = formElement.querySelector(".remove-form");
+        if (removeButton) {
+            removeButton.addEventListener("click", function () {
+                formElement.remove(); // Remove the form
+                updateTotalForms(); // Update form indices and total
             });
         }
+    }
+
+    // Function to update total forms and indices
+    function updateTotalForms() {
+        const forms = formContainer.querySelectorAll(".material-order-form");
+        totalFormsInput.value = forms.length; // Update total forms count
+
+        forms.forEach((form, index) => {
+            form.querySelectorAll("input, select").forEach((input) => {
+                const nameAttr = input.getAttribute("name");
+                if (nameAttr) {
+                    const newName = nameAttr.replace(/\d+/, index);
+                    input.setAttribute("name", newName);
+                    input.setAttribute("id", `id_${newName}`);
+                }
+            });
+        });
+    }
+
+    // Add event listener for "Add Material" button
+    addFormButton.addEventListener("click", addForm);
+
+    // Initialize remove handlers for existing forms
+    formContainer.querySelectorAll(".material-order-form").forEach((form) => {
+        addRemoveHandler(form);
     });
+});
 </script>
 
 {% endblock %}

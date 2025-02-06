@@ -1,62 +1,206 @@
 {% extends 'IT/index.html' %}
+{% load static %}
 
 {% block content %}
-    <!-- Container for Auto Parts Header -->
-    <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: space-between; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative; padding: 0 20px;">
-        <!-- Title on the left -->
-        <h1 style="color: white; font-family: 'Istok Web', sans-serif; margin: 0;">Auto Parts</h1>
-        
-        <!-- Search bar on the right -->
-        <form method="GET" action="{% url 'it:materials_it' %}" style="margin: 0; display: flex; align-items: center;">
-            <!-- Search Bar -->
-            <input type="text" name="search" placeholder="Search..." 
-                   style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; width: 250px; height: 40px; margin-right: 10px;"
-                   value="{{ request.GET.search }}">
-            
-            <!-- Category Dropdown -->
-            <select name="category" style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; height: 40px; margin-right: 10px;">
-                <option value="">All Categories</option>
-                {% for category in categories %}
-                <option value="{{ category.name }}" {% if category.name == selected_category %}selected{% endif %}>
-                    {{ category.name }}
-                </option>
-                {% endfor %}
-            </select>
-        
-            <!-- Submit Button -->
-            <button type="submit" style="padding: 8px 12px; border-radius: 7px; background-color: #294FA2; color: white; border: none; height: 40px;">
-                Search
-            </button>
-        </form>
+    <style>
+        /* Include Montserrat font */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+        /* Header Section Styling */
+        .header-container {
+            background-color: #294FA2;
+            height: 130px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 7px;
+            border-top-right-radius: 7px;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .header-title {
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+        }
+
+        .filter-container {
+            display: flex;
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-input,
+        .category-dropdown {
+            padding: 8px 12px;
+            border-radius: 7px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .search-button {
+            background-color: #2d6fa0;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-button:hover {
+            background-color: #2d6fa0;
+        }
+
+        /* Table Section Styling */
+        .table-container {
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 7px;
+        }
+
+        .table-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d6fa0;
+            margin-bottom: 15px;
+        }
+
+        .materials-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+        }
+
+        .materials-table th,
+        .materials-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+
+        .materials-table th {
+            background-color: #2d6fa0;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: none;  /* Ensure no shadow under the table header */
+            border-bottom: 2px solid #ddd;  /* Optional: fine border for clarity, if needed */
+        }
+
+        .materials-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .materials-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .materials-table td {
+            color: #333;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #888;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                height: auto;
+                align-items: center;
+                padding: 15px;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+
+            .filter-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .materials-table th,
+            .materials-table td {
+                font-size: 12px;
+                padding: 10px;
+            }
+        }
+    </style>
+
+    <!-- Header Section -->
+    <div class="header-container">
+        <h1 class="header-title">Auto Parts</h1>
+
+        <div class="filter-container">
+            <!-- Search Form -->
+            <form method="GET" action="{% url 'it:materials_it' %}" class="search-form">
+                <input type="text" name="search" placeholder="Search..." class="search-input" value="{{ request.GET.search }}">
+                <select name="category" class="category-dropdown">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.mat_name }}" {% if category.mat_name == selected_category %}selected{% endif %}>
+                        {{ category.mat_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="search-button">
+                    <i class="fas fa-search"></i>
+                </button>                           
+            </form>
+        </div>
     </div>
 
-    <!-- Table Container -->
-    <div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-top: -5px; border-radius: 7px; overflow: hidden;">
-        <!-- Table for materials -->
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+    <!-- Table Section -->
+    <div class="table-container">
+        <h3 class="table-title">Auto Parts List</h3>
+        <table class="materials-table">
             <thead>
-                <tr style="background-color: #f2f2f2; font-family: 'Alice', regular; font-size: 20px; border-bottom: 2px solid #000;">
-                    <th style="padding: 10px; border-right: 1px solid #ddd;">Name</th>
-                    <th style="padding: 10px; border-right: 1px solid #ddd;">Type</th>
-                    <th style="padding: 10px; border-right: 1px solid #ddd;">Quantity</th>
-                    <th style="padding: 10px; border-right: 1px solid #ddd;">Brand</th>
-                    <th style="padding: 10px; border-right: 1px solid #ddd;">Measurement</th>
-                    <th style="padding: 10px; border-right: 1px solid #ddd;">Category</th>
+                <tr>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Brand</th>
+                    <th>Measurement</th>
+                    <th>Category</th>
                 </tr>
             </thead>
             <tbody>
                 {% for mats in materials %}
-                <tr style="font-family: 'Istok Web', sans-serif; font-size: 18px; border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px;">{{ mats.mat_name }}</td>
-                    <td style="padding: 10px;">{{ mats.mat_type }}</td>
-                    <td style="padding: 10px;">{{ mats.mat_quantity }}</td>
-                    <td style="padding: 10px;">{{ mats.mat_brand }}</td>
-                    <td style="padding: 10px;">{{ mats.mat_measurement }}</td>
-                    <td style="padding: 10px;">{{ mats.mat_category }}</td>
+                <tr>
+                    <td>{{ mats.mat_name }}</td>
+                    <td>{{ mats.mat_quantity }}</td>
+                    <td>{{ mats.mat_brand }}</td>
+                    <td>{{ mats.mat_measurement }}</td>
+                    <td>{{ mats.mat_category }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 20px; font-style: italic;">No Auto Parts Available</td>
+                    <td colspan="6" class="no-data">No Auto Parts Available.</td>
                 </tr>
                 {% endfor %}
             </tbody>

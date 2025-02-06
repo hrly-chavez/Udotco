@@ -6,15 +6,14 @@
     <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">PURCHASE ORDERS</h1>
     
     <!-- Make Purchase Order Button -->
-    <a href="{% url 'finance:make_purchase_odr' %}" 
-       style="padding: 10px 20px; background-color: #2d6fa0; color: white; border-radius: 5px; text-decoration: none; position: absolute; bottom: 10px; left: 20px; font-size: 16px; font-family: 'Arial', sans-serif;">
+    <a href="{% url 'finance:create_purchase_order' %}" 
+        style="padding: 10px 20px; background-color: #2d6fa0; color: white; border-radius: 5px; text-decoration: none; position: absolute; bottom: 10px; left: 20px; font-size: 16px; font-family: 'Arial', sans-serif;">
         Create Purchase Order
     </a>
 
     <!-- Filter Forms Wrapper -->
     <div style="display: flex; position: absolute; bottom: 10px; right: 20px; gap: 20px;">
         <!-- Date Filter Form -->
-        
         <form method="get" action="{% url 'finance:filter_purchase_orders' %}" style="display: flex; align-items: center; gap: 10px;">
             <label for="start_date" style="color: white; font-size: 16px; font-family: 'Arial', sans-serif;">Filter by Date:</label>
             <input type="date" name="start_date" id="start_date" value="{{ form.start_date.value }}" style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;">
@@ -23,108 +22,98 @@
                 Filter
             </button>
         </form>
-        
 
-
-            <!-- Status Filter Form -->
-            <form method="get" action="{% url 'finance:filter_purchase_orders' %}" style="display: flex; align-items: center; gap: 10px;">
-                <label for="status" style="color: white; font-size: 16px; font-family: 'Arial', sans-serif;">Filter by Status:</label>
-                <select name="status" id="status" style="padding: 5px 10px; border-radius: 5px;">
-                    <option value="">All</option>
-                    {% for value, label in statuses %}
-                        <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>
-                            {{ label }}
-                        </option>
-                    {% endfor %}
-                </select>
-                <input type="hidden" name="start_date" value="{{ form.start_date.value }}">  <!-- Retain selected date -->
-                <button type="submit" style="padding: 8px 15px; background-color: #2d6fa0; color: white; border: none; border-radius: 5px;">
-                    Filter
-                </button>
-            </form>
-            
-
-
+        <!-- Status Filter Form -->
+        <form method="get" action="{% url 'finance:filter_purchase_orders' %}" style="display: flex; align-items: center; gap: 10px;">
+            <label for="status" style="color: white; font-size: 16px; font-family: 'Arial', sans-serif;">Filter by Status:</label>
+            <select name="status" id="status" style="padding: 5px 10px; border-radius: 5px;">
+                <option value="">All</option>
+                {% for value, label in statuses %}
+                    <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="start_date" value="{{ form.start_date.value }}">  <!-- Retain selected date -->
+            <button type="submit" style="padding: 8px 15px; background-color: #2d6fa0; color: white; border: none; border-radius: 5px;">
+                Filter
+            </button>
+        </form>
     </div>
 </div>
 
+<!-- Table for Purchase Orders -->
+<div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="border-left: 1px solid #000; border-right: 1px solid #000; border-top: 2px solid #000; border-bottom: 1px solid #000; font-family: 'Alice', regular; font-size: 20px;">
+                <th>PO Number</th>
+                <!-- <th>Item(s)</th>
+                <th>Quantity</th> -->
+                <th>Supplier</th>
+                <th>Date Created</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for po in purchase_orders %}
+            <tr style="font-family: 'Istok Web', sans-serif; font-size: 18px;">
+                <!-- PO Number -->
+                <td>{{ po.po_num }}</td>
 
+                
 
+                <!-- Supplier -->
+                <td>{{ po.sup_id.sup_name }}</td>
 
-    <!-- Table for Purchase Orders -->
-    <div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="border-left: 1px solid #000; border-right: 1px solid #000; border-top: 2px solid #000; border-bottom: 1px solid #000; font-family: 'Alice', regular; font-size: 20px;">
-                    <th>PO Number</th>
-                    <th>Item(s)</th>
-                    <th>Quantity</th>
-                    <th>Supplier</th>
-                    <th>Date Created</th>
-                    <th>Status</th> 
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for po in purchase_orders %}
-                <tr style="font-family: 'Istok Web', sans-serif; font-size: 18px;">
-                    <!-- PO Number -->
-                    <td>{{ po.po_num }}</td>
-                    
-                    <!-- Materials -->
-                    <td>
-                        {% for material in po.material_order_set.all %}
-                            <div>{{ material.mat_odr_name }}</div>
-                        {% empty %}
-                            <p>No materials added.</p>
-                        {% endfor %}
-                    </td>
-                    
-                    <!-- Quantities -->
-                    <td>
-                        {% for material in po.material_order_set.all %}
-                            <div>{{ material.mat_odr_qty }}</div>
-                        {% empty %}
-                            <p>No quantity available.</p>
-                        {% endfor %}
-                    </td>
-                    
-                    <!-- Supplier -->
-                    <td>{{ po.sup_id.sup_name }}</td>
-                    
-                     <!-- Date Created -->
-                     <td>{{ po.po_datemade|date:"F j, Y" }}</td> 
+                <!-- Date Created -->
+                <td>{{ po.po_datemade|date:"F j, Y" }}</td>
 
-                    
-                    <!-- Status -->
-                    <td>{{ po.postat_id.postat_status }}</td>
+                <!-- Status -->
+                <td>{{ po.postat_id.postat_status }}</td>
 
-                    <!-- Action -->
-                    <td style="white-space: nowrap;">
-                        <a href="{% url 'finance:view_purchase_odr' po.po_num %}" 
-                           style="padding: 5px 10px; background-color: #007bff; color: white; 
-                                  border-radius: 3px; text-decoration: none; font-size: 18px; margin-right: 10px;">
-                            View
-                        </a>
-                        <a href="{% url 'finance:edit_purchase_odr' po.po_num %}" 
-                           style="padding: 5px 10px; background-color: #4CAF50; color: white; 
-                                  border-radius: 3px; text-decoration: none; font-size: 18px; margin-right: 10px;">
-                            Edit
-                        </a>
-                        <a href="{% url 'finance:delete_purchase_odr' po.po_num %}" 
-                           style="padding: 5px 10px; background-color: #f44336; color: white; 
-                                  border-radius: 3px; text-decoration: none; font-size: 18px;">
-                            Delete
-                        </a>
-                    </td>
-                    
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6" style="text-align: center;">No Purchase Orders Available</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                <!-- Action -->
+                 <td style="white-space: nowrap;">              <!-- this is to view the details of everyhting including the materials -->
+                    <a href="{% url 'finance:view_purchase_odr' po.po_num %}" 
+                       style="padding: 5px 10px; background-color: #007bff; color: white; 
+                              border-radius: 3px; text-decoration: none; font-size: 18px; margin-right: 10px;">
+                        View
+                    </a>
+                    <a href="{% url 'finance:edit_purchase_odr' po.po_num %}" 
+                       style="padding: 5px 10px; background-color: #4CAF50; color: white; 
+                              border-radius: 3px; text-decoration: none; font-size: 18px; margin-right: 10px;">
+                        Edit
+                    </a>
+                    <a href="{% url 'finance:delete_purchase_odr' po.po_num %}" 
+                       onclick="return confirmDelete('{{ po.postat_id.postat_status }}');" 
+                       style="padding: 5px 10px; background-color: #f44336; color: white; 
+                              border-radius: 3px; text-decoration: none; font-size: 18px;">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center;">No Purchase Orders Available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function confirmDelete(status) {
+        let message = "Cannot delete a purchase order with 'Ongoing' status.";
+        
+        if (status === "Waiting") {
+            message = "Are you sure you want to delete this purchase order?";
+        } else if (status === "Done") {
+            message = "This purchase order Done. Are you sure you want to delete it?";
+        }
+
+        return confirm(message);
+    }
+</script>
+
 {% endblock %}

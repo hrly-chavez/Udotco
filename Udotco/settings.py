@@ -57,6 +57,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'IT.middleware.NoCacheMiddleware',
+    'driver.middleware.NoCacheMiddleware',
+    'finance.middleware.NoCacheMiddleware',
+    'mechanic.middleware.NoCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'Udotco.urls'
@@ -89,7 +92,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'udotco',
         'USER': 'postgres',
-        'PASSWORD': '123456',
+        'PASSWORD': '12345',
         'HOST': 'localhost',
         'PORT': '5432',
     }

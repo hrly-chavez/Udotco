@@ -5,6 +5,7 @@
 <div style="background-color: #294FA2; height: 110px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
     <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">JOB ORDERS</h1>
     <div style="display: flex; position: absolute; bottom: 10px; right: 20px;">
+    
         <!-- Filter Form -->
         <form method="GET" id="filter-form" style="display: flex; align-items: center;">
             <select id="status" name="status" class="form-select" onchange="document.getElementById('filter-form').submit();" style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; height: 40px; margin-left: 10px;">
@@ -15,7 +16,7 @@
             </select>
             <button type="submit" style="padding: 8px 15px; border-radius: 7px; background-color: #4CAF50; color: white; border: none; height: 40px; margin-left: 10px;">
                 Filter
-            </button>
+            </button> 
         </form>
     </div>
 </div>
@@ -30,78 +31,83 @@
                 <th>Requested Date</th>
                 <th>Work Description</th>
                 <th>Status</th>
-                <th
-                    {% if job.j_o_status != "Done" %}>
-                        Action
-                    {% endif %}
-                </th>
+                <th>Action Button</th>
                 <th>Assigned Mechanic</th>
+                <th>Date Completed</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            {% if job_orders %}
-                {% for job in job_orders %}
-                <tr style="font-family: 'Istok Web', sans-serif; font-size: 18px;">
-                    <td>{{ job.j_o_number }}</td>
-                    <td>{{ job.j_o_bus_unit_num.bus_unit_num }}</td>
-                    <td>{{ job.j_o_date_requested|date:"M d, Y" }}</td>
-                    <td>{{ job.j_o_work_description|truncatewords:10 }}</td>
-                    <td id="status-{{ job.j_o_number }}">{{ job.j_o_status }}</td>
-                    <td data-job-id="{{ job.j_o_number }}">
-                        {% if job.j_o_status == 'Pending' %}
-                            <button class="btn btn-success" onclick="updateStatus('{{ job.j_o_number }}', 'Ongoing')">Move to Ongoing</button>
-                        {% elif job.j_o_status == 'Ongoing' %}
-                            <button class="btn btn-primary" onclick="updateStatus('{{ job.j_o_number }}', 'Done')">Mark as Done</button>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if job.j_o_status == 'Pending' %}
-                            <select id="mechanic-select-{{ job.j_o_number }}" class="form-select">
-                                <option value="" disabled selected>Assign a Mechanic</option>
-                                {% for employee in employees %}
-                                <option value="{{ employee.emp_id }}" {% if job.j_o_checked_by == employee %}selected{% endif %}>
-                                    {{ employee.emp_fname }} {{ employee.emp_lname }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        {% else %}
-                            <span id="assigned-mechanic-{{ job.j_o_number }}">
-                                {% if job.j_o_checked_by %}
-                                    {{ job.j_o_checked_by.emp_fname }} {{ job.j_o_checked_by.emp_lname }}
-                                {% else %}
-                                    Not Assigned
-                                {% endif %}
-                            </span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{% url 'mechanic:create_item_req' job.j_o_number %}" 
+        {% if job_orders %}
+            {% for job in job_orders %}
+            <tr style="font-family: 'Istok Web', sans-serif; font-size: 18px;">
+                <td>{{ job.j_o_number }}</td>
+                <td>{{ job.j_o_bus_unit_num.bus_unit_num }}</td>
+                <td>{{ job.j_o_date_requested|date:"M d, Y" }}</td>
+                <td>{{ job.j_o_work_description|truncatewords:10 }}</td>
+                <td id="status-{{ job.j_o_number }}">{{ job.j_o_status }}</td>
+                <td data-job-id="{{ job.j_o_number }}">
+                    {% if job.j_o_status == 'Pending' %}
+                        <button class="btn btn-success" onclick="updateStatus('{{ job.j_o_number }}', 'Ongoing')">Move to Ongoing</button>
+                    {% elif job.j_o_status == 'Ongoing' %}
+                        <button class="btn btn-primary" onclick="updateStatus('{{ job.j_o_number }}', 'Done')">Mark as Done</button>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if job.j_o_status == 'Pending' %}
+                        <select id="mechanic-select-{{ job.j_o_number }}" class="form-select">
+                            <option value="" disabled selected>Assign a Mechanic</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.emp_id }}" {% if job.j_o_checked_by == employee %}selected{% endif %}>
+                                {{ employee.emp_fname }} {{ employee.emp_lname }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        <span id="assigned-mechanic-{{ job.j_o_number }}">
+                            {% if job.j_o_checked_by %}
+                                {{ job.j_o_checked_by.emp_fname }} {{ job.j_o_checked_by.emp_lname }}
+                            {% else %}
+                                Not Assigned
+                            {% endif %}
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if job.j_o_status == 'Done' %}
+                        {{ job.j_o_date_completed|date:"M d, Y" }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'mechanic:create_item_req' job.j_o_number %}" 
                         class="btn btn-primary btn-sm {% if job.j_o_status in statuses_to_disable %}disabled{% endif %}" 
                         style="padding: 5px 10px; text-decoration: none; color: white; background-color: {% if job.j_o_status in statuses_to_disable %}#cccccc{% else %}#007BFF{% endif %}; border: none; border-radius: 5px;">
                             Create Request
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="8" style="text-align: center;">No Job Orders Found</td>
-                </tr>
-            {% endif %}
-        </tbody>
+                    </a>
+                </td>
 
+
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="9" style="text-align: center;">No Job Orders Found</td>
+            </tr>
+        {% endif %}
+        </tbody>
     </table>
 </div>
 
 <script>
 function updateStatus(jobOrderId, nextStatus) {
-    const mechanicSelect = document.getElementById(mechanic-select-${jobOrderId});
+    const mechanicSelect = document.getElementById(`mechanic-select-${jobOrderId}`);
     const assignedMechanic = mechanicSelect ? mechanicSelect.value : null;
 
     // Mechanic assignment validation
     if (nextStatus === "Ongoing" && (!mechanicSelect || !assignedMechanic)) {
-        alert("Mechanic must be assigned before updating the status.");
+        alert("Please assign a mechanic before moving the job order to 'Ongoing'.");
         return;
     }
 
@@ -133,6 +139,5 @@ function updateStatus(jobOrderId, nextStatus) {
         alert("An unexpected error occurred.");
     });
 }
-
 </script>
 {% endblock %}

@@ -1,116 +1,226 @@
 {% extends 'IT/index.html' %}
+{% load static %}
 
 {% block content %}
-    <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
-        <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">Purchase Order</h1>
-        
+<!-- Font and Icons Links -->
+<link href="https://fonts.googleapis.com/css2?family=Istok+Web&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-        <div style="display: flex; position: absolute; bottom: 10px; right: 20px; gap: 20px;">
-            <!-- Date Filter Form -->
-            
-            <form method="get" action="{% url 'it:filter_purchase_orders' %}" style="display: flex; align-items: center; gap: 10px;">
-                <label for="start_date" style="color: white; font-size: 16px; font-family: 'Arial', sans-serif;">Filter by Date:</label>
-                <input type="date" name="start_date" id="start_date" value="{{ form.start_date.value }}" style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;">
-                <input type="hidden" name="status" value="{{ selected_status }}">  <!-- Retain selected status -->
-                <button type="submit" style="padding: 8px 15px; background-color: #2d6fa0; color: white; border: none; border-radius: 5px; font-size: 16px; font-family: 'Arial', sans-serif; cursor: pointer;">
-                    Filter
-                </button>
-            </form>
-            
-    
-    
-                <!-- Status Filter Form -->
-                <form method="get" action="{% url 'it:filter_purchase_orders' %}" style="display: flex; align-items: center; gap: 10px;">
-                    <label for="status" style="color: white; font-size: 16px; font-family: 'Arial', sans-serif;">Filter by Status:</label>
-                    <select name="status" id="status" style="padding: 5px 10px; border-radius: 5px;">
-                        <option value="">All</option>
-                        {% for value, label in statuses %}
-                            <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>
-                                {{ label }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <input type="hidden" name="start_date" value="{{ form.start_date.value }}">  <!-- Retain selected date -->
-                    <button type="submit" style="padding: 8px 15px; background-color: #2d6fa0; color: white; border: none; border-radius: 5px;">
-                        Filter
-                    </button>
-                </form>
-                
-    
-    
-        </div>
-    </div>
-    
-    
-    
-    
-    <!-- Table for Purchase Orders -->
-    <div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="border-left: 1px solid #000; border-right: 1px solid #000; border-top: 2px solid #000; border-bottom: 1px solid #000; font-family: 'Alice', regular; font-size: 20px;">
-                    <th>PO Number</th>
-                    <th>Item(s)</th>
-                    <th>Quantity</th>
-                    <th>Supplier</th>
-                    <th>Date Created</th>
-                    <th>Status</th> 
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for po in purchase_orders %}
-                <tr style="font-family: 'Istok Web', sans-serif; font-size: 18px;">
-                    <!-- PO Number -->
-                    <td>{{ po.po_num }}</td>
-                    
-                    <!-- Materials -->
-                    <td>
-                        {% for material in po.material_order_set.all %}
-                            <div>{{ material.mat_odr_name }}</div>
-                        {% empty %}
-                            <p>No materials added.</p>
-                        {% endfor %}
-                    </td>
-                    
-                    <!-- Quantities -->
-                    <td>
-                        {% for material in po.material_order_set.all %}
-                            <div>{{ material.mat_odr_qty }}</div>
-                        {% empty %}
-                            <p>No quantity available.</p>
-                        {% endfor %}
-                    </td>
-                    
-                    <!-- Supplier -->
-                    <td>{{ po.sup_id.sup_name }}</td>
-                    
-                     <!-- Date Created -->
-                     <td>{{ po.po_datemade|date:"F j, Y" }}</td> 
+<style>
+    h1 {
+        font-family: 'Montserrat', sans-serif;
+        color: white;
+        margin-left: 20px;
+        font-size: 30px;
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
 
-                    
-                    <!-- Status -->
-                    <td>{{ po.postat_id.postat_status }}</td>
+    /* Main Header Section */
+    .header-container {
+        background-color: #294FA2;
+        height: 130px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+        border-top-left-radius: 7px;
+        border-top-right-radius: 7px;
+        position: relative;
+    }
 
-                    <!-- Action -->
-                    <td style="white-space: nowrap;">
-                        <a href="{% url 'it:view_purchase_odr' po.po_num %}" 
-                           style="padding: 5px 10px; background-color: #007bff; color: white; 
-                                  border-radius: 3px; text-decoration: none; font-size: 18px; margin-right: 10px;">
-                            View
-                        </a>
-                    </td>
-                    
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6" style="text-align: center;">No Purchase Orders Available</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    /* Adjust button container to align to the right */
+    .button-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        justify-content: flex-end;
+        width: 100%;
+    }
 
-    
+    .btn-primary {
+        background-color: green;
+        border: 1px solid #2d6fa0;
+        padding: 8px 15px;
+        border-radius: 7px;
+        font-family: 'Istok Web', sans-serif;
+        font-size: 14px;
+        color: white;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary i {
+        margin-right: 5px;
+    }
+
+    .btn-primary:hover {
+        background-color: green;
+    }
+
+    .form-control {
+        padding: 8px;
+        border-radius: 7px;
+        border: 1px solid #ccc;
+        width: 250px;
+        height: 40px;
+    }
+
+    .btn-secondary {
+        background-color: #2d6fa0;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        font-size: 14px;
+        border-radius: 7px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-secondary i {
+        margin-right: 5px;
+    }
+
+    .btn-secondary:hover {
+        background-color: #245e82;
+    }
+
+    /* Table Styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    thead {
+        background-color: #2d6fa0;
+        color: white;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        box-shadow: none;
+        border-bottom: 2px solid #ddd;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .no-data {
+        text-align: center;
+        font-style: italic;
+        color: gray;
+        padding: 20px;
+    }
+
+    /* Modal Styling */
+    .modal-header {
+        background-color: #2d6fa0;
+        color: white;
+    }
+
+    .modal-footer .btn-danger {
+        background-color: #d9534f;
+        color: white;
+    }
+
+    .modal-footer .btn-danger:hover {
+        background-color: #c9302c;
+    }
+
+    .modal-footer .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .modal-footer .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    /* Responsive Design */
+    @media screen and (max-width: 768px) {
+        .header-container {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px;
+        }
+
+        .button-container {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .form-control {
+            width: 200px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            width: 100%;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+    }
+</style>
+
+<!-- Purchase Order Header -->
+<div class="header-container">
+    <h1 class="header-title">PURCHASE ORDERS</h1>
+</div>
+
+<!-- Table for Purchase Orders -->
+<div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 7px; margin-top: 20px; padding: 20px;">
+    <table>
+        <thead>
+            <tr>
+                <th>PO Number</th>
+                <th>Supplier</th>
+                <th>Date Created</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for po in purchase_orders %}
+            <tr>
+                <td>{{ po.po_num }}</td>
+                <td>{{ po.sup_id.sup_name }}</td>
+                <td>{{ po.po_datemade|date:"F j, Y" }}</td>
+                <td>{{ po.postat_id.postat_status }}</td>
+                <td class="table-action-links">
+                    <a href="{% url 'it:view_purchase_odr' po.po_num %}" class="view btn btn-primary">
+                        <i class="bi bi-eye"></i> View
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="no-data">No Purchase Orders Available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

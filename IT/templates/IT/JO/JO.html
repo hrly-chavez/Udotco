@@ -1,92 +1,177 @@
 {% extends 'IT/index.html' %}
+{% load static %}
 
 {% block content %}
-    <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
-        <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">Job Order</h1>
+<head>
+    <!-- Google Fonts for Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
 
-        <div style="display: flex; position: absolute; bottom: 10px; right: 20px;">
-            <!-- Search bar -->
-            <form method="GET" action="{% url 'it:JO' %}">
-                <input type="text" name="search" placeholder="Search..." 
-                       style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; width: 250px; height: 30px;"
-                       value="{{ request.GET.search }}">
-            </form>
-        </div>
-    </div>
+<!-- Custom Styles -->
+<style>
+    h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 30px;
+        color: white;
+    }
 
-    <!-- Filter Form -->
-    <div style="padding: 20px; background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-top: 20px;">
-        <form method="get" action="{% url 'it:JO' %}" style="display: flex; align-items: center; gap: 20px;">
-            <!-- Filter by Status -->
-            <select name="status" style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; font-size: 16px;">
-                <option value="">Select Status</option>
-                <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
-                <option value="Completed" {% if request.GET.status == 'Completed' %}selected{% endif %}>Completed</option>
-                <option value="In Progress" {% if request.GET.status == 'In Progress' %}selected{% endif %}>In Progress</option>
-            </select>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-            <!-- Filter by Checked By -->
-            <select name="checked_by" style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; font-size: 16px;">
-                <option value="">Select Checked By</option>
-                {% for emp in employees %}
-                    <option value="{{ emp.emp_id }}" {% if request.GET.checked_by == emp.emp_id %}selected{% endif %}>{{ emp.emp_fname }} {{ emp.emp_lname }}</option>
-                {% endfor %}
-            </select>
+    thead {
+        background-color: #2d6fa0;
+        color: white;
+    }
 
-            <!-- Filter by Approved By -->
-            <select name="approved_by" style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; font-size: 16px;">
-                <option value="">Select Approved By</option>
-                {% for emp in employees %}
-                    <option value="{{ emp.emp_id }}" {% if request.GET.approved_by == emp.emp_id %}selected{% endif %}>{{ emp.emp_fname }} {{ emp.emp_lname }}</option>
-                {% endfor %}
-            </select>
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 14px;
+    }
 
-            <!-- Filter by Date -->
-            <input type="date" name="date" value="{{ request.GET.date }}" style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;">
+    th {
+        font-weight: bold;
+        text-align: left;
+    }
 
-            <button type="submit" style="padding: 8px 15px; background-color: #2d6fa0; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
-                Filter
-            </button>
-        </form>
-    </div>
+    tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
 
-    <!-- Job Orders Table -->
-    <div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="border-left: 1px solid #000; border-right: 1px solid #000; border-top: 2px solid #000; border-bottom: 1px solid #000; font-family: 'Alice', regular; font-size: 15px;">
-                    <th>Job Order ID</th>
-                    <th>Date</th>
-                    <th>Description</th>
-                    <th>Material Code</th>
-                    <!-- <th>Material Used</th> -->
-                    <th>Date Completed</th>
-                    <th>Checked By</th>
-                    <th>Approved By</th>
-                    <th>Status</th>
-                    <th>Bus Unit Number</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for job in requests %}
-                <tr style="font-family: 'Istok Web', sans-serif; font-size: 18px;">
-                    <td>{{ job.j_o_number }}</td>
-                    <td>{{ job.j_o_date_requested }}</td>
-                    <td>{{ job.j_o_work_description }}</td>
-                    <td>{{ job.mat_used_id }}</td>
-                    <td>{{ job.j_o_date_completed }}</td>
-                    <td>{{ job.j_o_checked_by }}</td>
-                    <td>{{ job.j_o_approved_by }}</td>
-                    <td>{{ job.j_o_status }}</td>
-                    <td>{{ job.j_o_bus_unit_num }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="9" style="text-align: center;">No Job Orders available</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 20px;
+        color: gray;
+        font-style: italic;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background-color: #2d6fa0;
+        border-color: #255b85;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .btn-primary:hover {
+        background-color: #245880;
+        transform: scale(1.05);
+    }
+
+    .form-control {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        border-color: #294FA2;
+        outline: none;
+    }
+
+    @media (max-width: 768px) {
+        table {
+            font-size: 14px;
+        }
+
+        .form-control {
+            padding: 8px;
+            font-size: 13px;
+        }
+    }
+</style>
+
+<!-- Header Section -->
+<div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
+    <h1 style="color: white; margin-left: 20px; font-family: 'Montserrat', sans-serif; font-size: 30px;">
+        Job Order
+    </h1>
+</div>
+
+<!-- Filter Form -->
+<div class="filter-container" style="margin-top: 20px;">
+    <form method="GET" action="{% url 'it:JO' %}" class="filter-form" style="display: flex; justify-content: space-between; gap: 10px;">
+        <!-- Filter by Status -->
+        <select name="status" class="form-control">
+            <option value="">Select Status</option>
+            <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Completed" {% if request.GET.status == 'Completed' %}selected{% endif %}>Completed</option>
+            <option value="Ongoing" {% if request.GET.status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
+        </select>
+
+        <!-- Filter by Checked By -->
+        <select name="checked_by" class="form-control">
+            <option value="">Select Checked By</option>
+            {% for emp in employees %}
+            <option value="{{ emp.emp_id }}" {% if request.GET.checked_by == emp.emp_id %}selected{% endif %}>{{ emp.emp_fname }} {{ emp.emp_lname }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Filter by Approved By -->
+        <select name="approved_by" class="form-control">
+            <option value="">Select Approved By</option>
+            {% for emp in employees %}
+            <option value="{{ emp.emp_id }}" {% if request.GET.approved_by == emp.emp_id %}selected{% endif %}>{{ emp.emp_fname }} {{ emp.emp_lname }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Filter by Date -->
+        <input type="date" name="date" value="{{ request.GET.date }}" class="form-control">
+
+        <!-- Filter Button -->
+        <button type="submit" class="btn-primary">
+            <i class="fa fa-filter"></i>
+        </button>
+    </form>
+</div>
+
+<!-- Main Table Section -->
+<div style="background-color: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-radius: 7px; margin-top: 20px; padding: 20px;">
+    <table>
+        <thead>
+            <tr style="border: 2px solid #2d6fa0;">
+                <th>Job Order ID</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Material Code</th>
+                <th>Date Completed</th>
+                <th>Checked By</th>
+                <th>Approved By</th>
+                <th>Status</th>
+                <th>Bus Unit Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in requests %}
+            <tr>
+                <td>{{ job.j_o_number }}</td>
+                <td>{{ job.j_o_date_requested }}</td>
+                <td>{{ job.j_o_work_description }}</td>
+                <td>{{ job.mat_used_id }}</td>
+                <td>{{ job.j_o_date_completed }}</td>
+                <td>{{ job.j_o_checked_by }}</td>
+                <td>{{ job.j_o_approved_by }}</td>
+                <td>{{ job.j_o_status }}</td>
+                <td>{{ job.j_o_bus_unit_num }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="no-data">No Job Orders available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

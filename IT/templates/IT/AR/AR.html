@@ -1,59 +1,146 @@
 {% extends 'IT/index.html' %}
 
 {% block content %}
-    <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
-        <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">Acknowledgement Receipt</h1>
-        
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
 
-        <div style="display: flex; position: absolute; bottom: 10px; right: 20px;">
-            <!-- Search bar -->
-            <form method="GET" action="{% url 'it:JO' %}">
-                <input type="text" name="search" placeholder="Search..." 
-                       style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; width: 250px; height: 30px;"
-                       value="{{ request.GET.search }}">
-            </form>
-        </div>
-    </div>
-    
-    
-    
-    
-    <div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="border-left: 1px solid #000; border-right: 1px solid #000; border-top: 2px solid #000; border-bottom: 1px solid #000; font-family: 'Alice', regular; font-size: 15px;">
-                    <th>AR ID</th>
-                    <th>Date Made</th>
-                    <th>Date Received</th>
-                    <th>Material Code</th>
-                    <th>Material Quantity</th>
-                    <th>Receiver</th>
-                    <th>Created By</th>
-                    <th>Note</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ar in Job_Order %}
-                <tr style="font-family: 'Istok Web', sans-serif; font-size: 18px;">
-                    <td>{{ ar.ar_num }}</td>
-                    <td>{{ ar.ar_date_made }}</td>
-                    <td>{{ ar.ar_date_received }}</td>
-                    <td>{{ ar.mat_code }}</td>
-                    <td>{{ ar.ar_mat_quantity }}</td>
-                    <td>{{ ar.ar_receiver }}</td>
-                    <td>{{ ar.created_by }}</td>
-                    <td>{{ ar.ar_note }}</td>
-                    <td>{{ ar.status }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6" style="text-align: center;">No Acknowledgement Receipt available</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+<!-- Custom Styles -->
+<style>
+    h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 30px;
+        color: white;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background-color: #2d6fa0; 
+        color: white;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        font-weight: bold;
+        text-align: left;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn-primary {
+        background-color: #2d6fa0; 
+        border-color: #007bff;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    .form-control {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        border-color: #294FA2;
+        outline: none;
+    }
+
+    @media (max-width: 768px) {
+        table {
+            font-size: 14px;
+        }
+
+        .form-control {
+            padding: 8px;
+            font-size: 13px;
+        }
+    }
+</style>
+
+<!-- Header Section -->
+<div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
+    <h1 style="color: white; margin-left: 20px; font-family: 'Montserrat', sans-serif; font-size: 30px;">
+        Acknowledgement Receipt
+    </h1>
+</div>
+
+<!-- Filter Form -->
+<div style="margin: 20px;">
+    <form method="GET" action="{% url 'it:AR' %}">
+        <div style="display: flex; gap: 20px;">
+            <!-- Status Dropdown -->
+            <select name="status" style="padding: 5px;">
+                <option value="">Filter by Status</option>
+                <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Ongoing" {% if request.GET.status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
+                <option value="Delivered" {% if request.GET.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+            </select>
+
             
-        </table>
-    </div>
 
+            <!-- Icon Button -->
+            <button type="submit" style="background-color: #2d6fa0; border: none; border-radius: 5px; color: white; padding: 8px 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                <i class="fas fa-filter" style="font-size: 16px; color: white;"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+
+<!-- Main Table Section -->
+<div style="background-color: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-radius: 7px; margin-top: 20px; padding: 20px;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Montserrat', sans-serif;">
+        <thead>
+            <tr style="border: 2px solid #2d6fa0;"> <!-- Table header with updated color -->
+                <th>AR ID</th>
+                    <th>Date Made</th>
+                    <th>Status</th>
+                    <th>Note</th>
+                    <th>Approve Item</th>
+                    <th>Received</th>
+                    <th>Receiver</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ar in ack_req %}
+            <tr style="border-bottom: 1px solid #ccc; font-size: 16px;">
+                <td>{{ ar.ar_num }}</td>
+                    <td>{{ ar.ar_date_made }}</td>
+                    <td>{{ ar.ar_status }}</td>
+                    <td>{{ ar.ar_note }}</td>
+                    <td>{{ ar.item_approved_id }}</td>
+                    <td>{{ ar.ar_date_received }}</td>
+                    <td>{{ ar.ar_date_receiver }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" style="text-align: center; padding: 20px; color: gray; font-style: italic;">No Acknowledgement Receipt available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

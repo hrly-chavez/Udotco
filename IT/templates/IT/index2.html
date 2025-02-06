@@ -1,10 +1,11 @@
 {% extends 'IT/index.html' %}
 {% load static %}
+
 {% block content %}
 <div class="container">
     <!-- Header Section -->
     <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;">
-        <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">Department(s)</h1>
+        <h1 style="color: white; margin-left: 20px; font-family: 'Montserrat', sans-serif;">Department(s)</h1>
     </div>
 
     <!-- This is a block to allow child templates to insert content -->
@@ -13,4 +14,7 @@
         {% endblock %}
     </div>
 </div>
+
+<!-- Importing Montserrat font from Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 {% endblock %}

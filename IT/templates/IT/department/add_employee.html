@@ -1,151 +1,287 @@
 {% extends 'IT/index.html' %}
 {% load static %}
 {% block content %}
-    <!-- Header for Add Employee -->
-    <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px;">
-        <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">Add Employee</h1>
-    </div>
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<style>
+    /* General Page Styles */
+    body {
+        font-family: 'Roboto', sans-serif;
+    }
 
-    <!-- Centered Form Container -->
-    <div style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px; max-width: 900px; margin: 40px auto; border-radius: 7px;">
+    .header {
+        background-color: #294FA2;
+        height: 130px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        border-radius: 7px 7px 0 0;
+    }
 
-        <!-- Display form errors -->
-    
+    .header h1 {
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        font-size: 28px;
+        margin: 0;
+    }
 
+    .form-container {
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        max-width: 900px;
+        margin: 40px auto;
+        border-radius: 7px;
+    }
 
-        <!-- Employee Form -->
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <fieldset>
-                <legend>Employee Information</legend>
+    legend {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 500;
+        font-size: 20px;
+        color: #294FA2;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #eaeaea;
+        padding-bottom: 10px;
+    }
 
-                <div class="row">
-                    <!-- First Name -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_emp_fname" class="form-label mt-4">First Name</label>
-                            {{ form.emp_fname }}
-                        </div>
-                    </div>
+    .form-group {
+        margin-bottom: 20px;
+    }
 
-                    <!-- Last Name -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_emp_lname" class="form-label mt-4">Last Name</label>
-                            {{ form.emp_lname }}
-                        </div>
-                    </div>
-                </div>
+    .form-group label {
+        font-weight: 500;
+        margin-bottom: 5px;
+        display: block;
+    }
 
-                <div class="row">
-                    <!-- Middle Initial -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_emp_initial" class="form-label mt-4">Middle Initial</label>
-                            {{ form.emp_initial }}
-                            {% if errors.emp_initial %}
-                                <p style="color: red;">{{ errors.emp_initial }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
+    .form-group p {
+        margin-top: 5px;
+        font-size: 14px;
+        color: red;
+    }
 
-                    <!-- Suffix -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_emp_suffix" class="form-label mt-4">Suffix</label>
-                            {{ form.emp_suffix }}
-                        </div>
-                    </div>
-                </div>
+    .btn-primary {
+        background-color: #294FA2;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-family: 'Roboto', sans-serif;
+        transition: 0.3s ease;
+    }
 
-                <div class="row">
-                    <!-- Date of Birth -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_emp_date_of_birth" class="form-label mt-4">Date of Birth</label>
-                            {{ form.emp_date_of_birth }}
-                        </div>
-                    </div>
+    .btn-primary:hover {
+        background-color: #1d3c7a;
+        transform: scale(1.05);
+    }
 
-                    <!-- Sex -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_emp_sex" class="form-label mt-4">Sex</label>
-                            {{ form.emp_sex }}
-                        </div>
-                    </div>
-                </div>
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-family: 'Roboto', sans-serif;
+        text-decoration: none;
+        transition: 0.3s ease;
+    }
 
-                <div class="row">
-                    <!-- Address -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_emp_address" class="form-label mt-4">Address</label>
-                            {{ form.emp_address }}
-                        </div>
-                    </div>
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        transform: scale(1.05);
+    }
 
-                    <!-- Contact Number -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_emp_contact_num" class="form-label mt-4">Contact Number</label>
-                            {{ form.emp_contact_num }}
-                            {% if errors.emp_contact_num %}
-                                <p style="color: red;">{{ errors.emp_contact_num }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
+    .messages .alert {
+        margin-bottom: 20px;
+        font-size: 14px;
+        padding: 10px;
+        border-radius: 5px;
+    }
 
-                <div class="row">
-                    <!-- Role -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_emp_role" class="form-label mt-4">Role</label>
-                            {{ form.emp_role }}
-                        </div>
-                    </div>
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
 
-                    <!-- Department -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_dept_id" class="form-label mt-4">Department</label>
-                            {{ form.dept_id }}
-                        </div>
-                    </div>
-                </div>
+    .col-md-6 {
+        flex: 0 0 calc(50% - 10px);
+    }
 
-                <div class="row">
-                    <!-- Image -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="id_emp_image" class="form-label mt-4">Upload Image</label>
-                            {{ form.emp_image }}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="form-group text-center mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg">Add Employee</button>
-                </div>
-            </fieldset>
-        </form>
-
-        <!-- Back to Employee List -->
-        <div class="text-center mt-4">
-            <a href="{% url 'it:department' %}" class="btn btn-secondary btn-lg">Back to Departments</a>
-        </div>
-    </div>
-
-    <script>
-        function setDefaultDate(element) {
-            if (!element.value) {
-                const today = new Date();
-                const defaultDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-                const formattedDate = defaultDate.toISOString().split('T')[0];
-                element.value = formattedDate;
-            }
+    @media (max-width: 768px) {
+        .col-md-6 {
+            flex: 0 0 100%;
         }
-    </script>
+    }
+</style>
+
+<!-- Header Section -->
+<div class="header">
+    <h1 style="font-family: 'Montserrat', sans-serif; font-weight: 600;">Add Employee</h1>
+</div>
+
+<!-- Form Container -->
+<div class="form-container">
+    <!-- Display form errors -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Employee Form -->
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Employee Information</legend>
+
+            <div class="row">
+                <!-- First Name -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_emp_fname">First Name</label>
+                        {{ form.emp_fname }}
+                    </div>
+                </div>
+
+                <!-- Last Name -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_emp_lname">Last Name</label>
+                        {{ form.emp_lname }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Middle Initial -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_emp_initial">Middle Initial</label>
+                        {{ form.emp_initial }}
+                        {% if errors.emp_initial %}
+                            <p>{{ errors.emp_initial }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Suffix -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_emp_suffix">Suffix</label>
+                        {{ form.emp_suffix }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Date of Birth -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_emp_date_of_birth">Date of Birth</label>
+                        {{ form.emp_date_of_birth }}
+                    </div>
+                </div>
+
+                <!-- Sex -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_emp_sex">Sex</label>
+                        {{ form.emp_sex }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Address -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_emp_address">Address</label>
+                        {{ form.emp_address }}
+                    </div>
+                </div>
+
+                <!-- Contact Number -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_emp_contact_num">Contact Number</label>
+                        {{ form.emp_contact_num }}
+                        {% if errors.emp_contact_num %}
+                            <p>{{ errors.emp_contact_num }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Role -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_emp_role">Role</label>
+                        {{ form.emp_role }}
+                    </div>
+                </div>
+
+                <!-- Department -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_dept_id">Department</label>
+                        {{ form.dept_id }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Image -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_emp_image">Upload Image</label>
+                        {{ form.emp_image }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Add Employee</button>
+            </div>
+        </fieldset>
+    </form>
+
+    <!-- Back to Departments -->
+    <div class="text-center mt-4">
+        <a href="{% url 'it:department' %}" class="btn btn-secondary btn-lg">
+            <i class="fa fa-arrow-left"></i> Back to Departments
+        </a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateInput = document.getElementById('id_emp_date_of_birth');
+
+        if (dateInput) {
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            dateInput.setAttribute('max', formattedDate); // Set the max date to today
+        }
+    });
+
+    function setDefaultDate(element) {
+        if (!element.value) {
+            const today = new Date();
+            const defaultDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+            const formattedDate = defaultDate.toISOString().split('T')[0];
+            element.value = formattedDate;
+        }
+    }
+</script>
 {% endblock %}

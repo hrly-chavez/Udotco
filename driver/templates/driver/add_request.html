@@ -7,6 +7,134 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Add Job Request</title>
         <link rel="stylesheet" href="{% static 'driverstyle.css' %}">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+        <style>
+            /* General Styling */
+            body {
+                font-family: 'Roboto', sans-serif;
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+                background: linear-gradient(135deg, maroon 50%, rgb(41, 79, 162) 50%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+    
+            .form-container {
+                max-width: 600px;
+                margin: 50px auto;
+                background-color: white;
+                padding: 20px 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+    
+            .form-container h1 {
+                text-align: center;
+                font-family: 'Montserrat', sans-serif;
+                color: #294FA2;
+                font-weight: 600;
+                margin-bottom: 20px;
+            }
+    
+            .form-group {
+                margin-bottom: 20px;
+            }
+    
+            .form-group label {
+                display: block;
+                font-weight: 500;
+                color: #333;
+                margin-bottom: 5px;
+            }
+    
+            .form-group input, .form-group select, .form-group textarea {
+                width: 100%;
+                padding: 10px;
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-sizing: border-box;
+            }
+    
+            .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+                outline: none;
+                border-color: #294FA2;
+                box-shadow: 0 0 5px rgba(41, 79, 162, 0.2);
+            }
+    
+            .form-actions {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+    
+            .submit_btn {
+                background-color: #294FA2;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-size: 16px;
+                cursor: pointer;
+                text-decoration: none;
+            }
+    
+            .submit_btn:hover {
+                background-color: #466ab8;
+            }
+    
+            .cancel_btn {
+                background-color: #f44336;
+                color: white;
+                text-decoration: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-size: 16px;
+                display: inline-block;
+                text-align: center;
+            }
+    
+            .cancel_btn:hover {
+                background-color: #e53935;
+            }
+    
+            .error-message {
+                background-color: #ffebee;
+                color: #b71c1c;
+                padding: 15px;
+                border: 1px solid #b71c1c;
+                border-radius: 5px;
+                margin-bottom: 20px;
+            }
+    
+            .error-message ul {
+                list-style-type: none;
+                padding: 0;
+            }
+    
+            .error-message li {
+                font-size: 14px;
+            }
+    
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .form-container {
+                    padding: 20px;
+                }
+    
+                .form-actions {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+    
+                .submit_btn, .cancel_btn {
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+        </style>
     </head>
     <body>
         <div class="form-container">

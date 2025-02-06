@@ -13,21 +13,29 @@ def login_required(view_func):
     return wrapper
 
 
-# @login_required
+@login_required
 def driver_request(request):
-    query = request.GET.get('search')  # Get search query from request parameters
+    try:
+        query = request.GET.get('search')  # Get search query from request parameters
 
-    if query:
-        # Filter job orders by date containing the search query
-        requests = JobOrder.objects.filter(j_o_date_requested__icontains=query)
-    else:
-        # Retrieve all job orders if no search query
-        requests = JobOrder.objects.all()
+        if query:
+            # Filter job orders by date containing the search query
+            requests = JobOrder.objects.filter(j_o_date_requested__icontains=query)
+        else:
+            # Retrieve all job orders if no search query
+            requests = JobOrder.objects.all()
 
-    # Pass the queryset to the template
-    return render(request, 'driver/driver.html', {'requests': requests})
+        #passes the query set and readonly flag to the template
+        form = JobOrderForm(initial={'readonly':True})
 
-# @login_required
+        # Pass the queryset to the template
+        return render(request, 'driver/driver.html', {'requests': requests, 'form': form})
+
+    except Exception as e:
+        messages.error(request, f"An error occured: {str(e)}")
+        return render(request, 'driver/driver.html',{'requests': [], 'form': None})
+
+@login_required
 def add_request(request):
     if request.method == 'POST':
         form = JobOrderForm(request.POST)
@@ -43,7 +51,7 @@ def add_request(request):
     return render(request, 'driver/add_request.html', {'form': form})
 
 
-# @login_required
+@login_required
 def logout_view(request):
     # Clear the session (log out the user)
     logout(request)
@@ -51,5 +59,3 @@ def logout_view(request):
     return redirect('login:login')  # Redirect to login page
 
 
-def minus(request):
-    pass

@@ -1,6 +1,7 @@
 from django import forms
 from shared.models import *
 from django.core.exceptions import ValidationError
+from datetime import date
 
 # class EmployeeForm(forms.ModelForm):  # For adding employees
 #     class Meta:
@@ -15,7 +16,13 @@ from django.core.exceptions import ValidationError
 #             'emp_lname': forms.TextInput(attrs={'placeholder': 'Enter last name'}),
 #             'emp_initial': forms.TextInput(attrs={'placeholder': 'Optional: Middle Initial'}),
 #             'emp_suffix': forms.TextInput(attrs={'placeholder': 'Optional: Suffix'}),
-#             'emp_date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+#             'emp_date_of_birth': forms.DateInput(
+#                 attrs={
+#                     'type': 'date',
+#                     'onfocus': "setDefaultDate(this)"  # Add a JavaScript function
+#                 }
+#             ),
+
 #             'emp_sex': forms.Select(choices=[
 #                 ('', 'Select...'),
 #                 ('Male', 'Male'),
@@ -42,12 +49,8 @@ class EmployeeForm(forms.ModelForm):  # For adding employees
             'emp_initial': forms.TextInput(attrs={'placeholder': 'Optional: Middle Initial'}),
             'emp_suffix': forms.TextInput(attrs={'placeholder': 'Optional: Suffix'}),
             'emp_date_of_birth': forms.DateInput(
-                attrs={
-                    'type': 'date',
-                    'onfocus': "setDefaultDate(this)"  # Add a JavaScript function
-                }
+                attrs={'type': 'date', 'onfocus': "setDefaultDate(this)"}
             ),
-
             'emp_sex': forms.Select(choices=[
                 ('', 'Select...'),
                 ('Male', 'Male'),
@@ -59,6 +62,12 @@ class EmployeeForm(forms.ModelForm):  # For adding employees
             'dept_id': forms.Select(attrs={'placeholder': 'Select department'}),
             'emp_image': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
         }
+
+    def clean_emp_date_of_birth(self):
+        emp_date_of_birth = self.cleaned_data.get('emp_date_of_birth')
+        if emp_date_of_birth and emp_date_of_birth > date.today():
+            raise forms.ValidationError("Date of birth cannot be in the future.")
+        return emp_date_of_birth
 
 class BusForm(forms.ModelForm):
     class Meta:
@@ -87,11 +96,10 @@ class BusForm(forms.ModelForm):
 
     def clean_bus_unit_num(self):
         bus_unit_num = self.cleaned_data.get('bus_unit_num')
-        
-        # Check for negative bus unit number
-        if bus_unit_num is not None and bus_unit_num < 0:
-            raise ValidationError("Bus Unit Number cannot be negative.")
-        
+
+        if not bus_unit_num:
+            raise ValidationError("Bus Unit Number is required.")
+
         if not self.instance.pk:
             # Adding a new bus, ensure uniqueness
             if Bus.objects.filter(bus_unit_num=bus_unit_num).exists():
@@ -100,7 +108,7 @@ class BusForm(forms.ModelForm):
             # Editing, ensure uniqueness excluding current instance
             if Bus.objects.filter(bus_unit_num=bus_unit_num).exclude(pk=self.instance.pk).exists():
                 raise ValidationError("Bus Unit Number must be unique.")
-        
+
         return bus_unit_num
 
     def clean(self):
@@ -132,6 +140,7 @@ class BusForm(forms.ModelForm):
             self.add_error('bus_tag_num', "Tag Number must be unique.")
 
         return cleaned_data
+
 
 
 class AccountsForm(forms.ModelForm):

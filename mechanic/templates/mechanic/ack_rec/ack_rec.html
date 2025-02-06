@@ -1,17 +1,64 @@
 {% extends 'mechanic/index.html' %}
 
 {% block content %}
-    <!-- container of materials -->
-    <div style="background-color: #294FA2; height: 110px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; position: relative;padding: 0 20px">
-        <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">ACKNOWLEDGEMENT RECEIPT</h1>
-        <div style="display: flex; position: absolute; bottom: 10px; right: 20px;">
-            <!-- Search bar -->
-            <form method="GET" action="{% url 'mechanic:inventory' %}">
-                <input type="text" name="search" placeholder="Search..." 
-                    style="padding: 8px; border-radius: 7px; border: 1px solid #ccc; width: 250px; height: 40px;"
-                    value="{{ request.GET.search }}">
-            </form>
-        </div>
+<div style="background-color: #294FA2; height: 130px; display: flex; align-items: center; border-radius: 7px;">
+    <h1 style="color: white; margin-left: 20px;">Acknowledgment Receipt</h1>
+    <div style="margin-left: auto; margin-right: 20px;">
+        <form method="GET" action="{% url 'mechanic:ack_rec' %}">
+            <input type="text" name="search" placeholder="Search..." style="padding: 8px; border-radius: 7px; width: 200px;">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
     </div>
+</div>
+
+<div style="margin-top: 20px; background-color: white; padding: 20px; border-radius: 7px;">
+    <h2>Acknowledgment Receipts</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Receipt Number</th>
+                <th>Note</th>
+                <th>Approved Material</th>
+                <th>Status</th>
+                <th>Received By</th>
+                <th>Date Received</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for receipt in receipts %}
+                <tr>
+                    <td>{{ receipt.ar_num }}</td>
+                    <td>{{ receipt.ar_note }}</td>
+                    
+                    <td>{{ receipt.item_approved_id }}</td>
+                    <td>{{ receipt.ar_status }}</td>
+                    <td>
+                        {% if receipt.ar_date_receiver %}
+                            {{ receipt.ar_date_receiver.emp_fname }} {{ receipt.ar_date_receiver.emp_lname }}
+                        {% else %}
+                            <form method="POST" action="{% url 'mechanic:ack_rec' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="receipt_id" value="{{ receipt.ar_num }}">
+                                <select name="receiver_id" class="form-control">
+                                    <option value="">Select Employee</option>
+                                    {% for employee in vehicle_maintenance_employees %}
+                                        <option value="{{ employee.emp_id }}">
+                                            {{ employee.emp_fname }} {{ employee.emp_lname }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                    <td>{{ receipt.ar_date_received|date:"M d, Y" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No acknowledgment receipts available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
-    

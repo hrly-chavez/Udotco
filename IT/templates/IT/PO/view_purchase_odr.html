@@ -1,13 +1,17 @@
 {% extends 'IT/index.html' %}
 
 {% block content %}
-    <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px;">
-        <h1 style="color: white; margin-left: 20px; font-family: 'Istok Web', sans-serif;">View Purchase Order</h1>
+    <!-- Header Section -->
+    <div style="background-color: #294FA2; height: 130px; width: 100%; display: flex; align-items: center; border-top-left-radius: 7px; border-top-right-radius: 7px; padding: 0 20px;">
+        <h1 style="color: white; font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: bold; margin: 0;">
+            View Purchase Order
+        </h1>
     </div>
 
     <div class="container mt-4">
-        <h3>Purchase Order Details</h3>
-        <div class="card p-4 mb-4">
+        <!-- Purchase Order Details -->
+        <h3 style="font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: bold; color: #294FA2;">Purchase Order Details</h3>
+        <div class="card p-4 mb-4" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border-radius: 10px; font-family: 'Roboto', sans-serif; font-size: 16px;">
             <p><strong>Description:</strong> {{ purchase_order.po_description }}</p>
             <p><strong>Date Created:</strong> {{ purchase_order.po_datemade|date:"F j, Y" }}</p>
             <p><strong>Status:</strong> {{ purchase_order.postat_id.postat_status }}</p>
@@ -15,20 +19,30 @@
             <p><strong>Approved By:</strong> {{ purchase_order.po_approved_by }}</p>
         </div>
 
-        <h3>Material Orders</h3>
-        <div class="card p-4 mb-4">
+        <!-- Material Orders -->
+        <h3 style="font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: bold; color: #294FA2;">Material Orders</h3>
+        <div class="card p-4 mb-4" style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border-radius: 10px; font-family: 'Roboto', sans-serif; font-size: 16px;">
             {% for material in material_orders %}
-                <p><strong>Material Name:</strong> {{ material.mat_odr_name }}</p>
-                <p><strong>Quantity:</strong> {{ material.mat_odr_qty }}</p>
-                <p><strong>Brand:</strong> {{ material.mat_odr_brand }}</p>
-                <p><strong>Measurement / Size:</strong> {{ material.mat_odr_measurement }}</p>
-                <p><strong>Category:</strong> {{ material.mat_category }}</p>
-                <hr>
+                <div style="margin-bottom: 20px;">
+                    <p><strong>Material Name:</strong> {{ material.mat_odr_name }}</p>
+                    <p><strong>Quantity:</strong> {{ material.mat_odr_qty }}</p>
+                    <p><strong>Brand:</strong> {{ material.mat_odr_brand }}</p>
+                    <p><strong>Measurement / Size:</strong> {{ material.mat_odr_measurement }}</p>
+                    <p><strong>Category:</strong> {{ material.mat_category }}</p>
+                </div>
+                {% if not forloop.last %}
+                    <hr style="border: 1px solid #ddd;">
+                {% endif %}
             {% empty %}
-                <p>No materials found for this purchase order.</p>
+                <p style="color: #777;">No materials found for this purchase order.</p>
             {% endfor %}
         </div>
 
-        <a href="{% url 'it:purchase_odr' %}" class="btn btn-secondary">Back to Purchase Orders</a>
+        <!-- Back Button -->
+        <a href="{% url 'it:purchase_odr' %}" 
+           class="btn btn-secondary" 
+           style="padding: 10px 20px; font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: bold; text-transform: uppercase; border-radius: 5px; background-color: #294FA2; color: white; text-decoration: none; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);">
+            Back to Purchase Orders
+        </a>
     </div>
 {% endblock %}

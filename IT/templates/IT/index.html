@@ -8,8 +8,8 @@
     <title>Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'finance/materials.css' %}">
-
     <style>
         body {
             display: flex;
@@ -26,22 +26,51 @@
             border-right: 1px solid #d3d3d3;
             box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
         }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 150px;
+            height: auto;
+        }
         .sidebar a {
             color: rgb(17, 17, 17);
             text-decoration: none;
             padding: 15px 20px;
             display: block;
             transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: none;
         }
         .sidebar a:hover {
-            background-color: #495057;
+            background-color: #2d6fa0;
             color: white;
+            transform: translateY(-10px);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
         .sidebar a.active {
             color: white;
-            background-color: #007bff;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.3);
+            background-color: #2d6fa0;
+            transform: translateY(-10px);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
             font-weight: bold;
+            border-left: 4px solid #171718;
+        }
+        .logout {
+            margin-top: auto;
+            text-align: center;
+            width: 100%;
+        }
+        .logout a {
+            width: 100%;
+            margin: 0;
+            border-radius: 0;
+            text-align: center;
+            display: block;
+            box-sizing: border-box;
+            background-color: red;
+            color: white;
         }
         .content {
             flex: 1;
@@ -51,62 +80,69 @@
 </head>
 <body>
     <div class="sidebar">
-        <h2 class="text-center">Dashboard</h2><br><br>
-        <a href="{% url 'it:department' %}" class="{% if request.resolver_match.url_name == 'it:department' %}active{% endif %}">
-            Department
-        </a><br>
-        <a href="{% url 'it:bus' %}" class="{% if request.resolver_match.url_name == 'it:bus' %}active{% endif %}">
-            Bus
-        </a><br>
-        <a href="{% url 'it:JO' %}" class="{% if request.resolver_match.url_name == 'it:JO' %}active{% endif %}">
-            Job Order
-        </a><br>
-        <a href="{% url 'it:AR' %}" class="{% if request.resolver_match.url_name == 'it:AR' %}active{% endif %}">
-            Acknowledgement Receipt
-        </a><br>
-        <a href="{% url 'it:purchase_odr' %}" class="{% if request.resolver_match.url_name == 'it:purchase_odr' %}active{% endif %}">
-            Purchase Order
-        </a><br>
-        <a href="{% url 'it:materials_it' %}" class="{% if request.resolver_match.url_name == 'it:materials_it' %}active{% endif %}">
-            Materials
-        </a><br>
-        <a href="{% url 'it:Accounts' %}" class="{% if request.resolver_match.url_name == 'it:Accounts' %}active{% endif %}">
-            Accounts
-        </a><br>
-        <!-- Logout Button -->
-        <a href="#" class="btn btn-danger" id="logoutBtn">
-            Logout
+        <div class="logo">
+            <img src="{% static 'logo/logo.png' %}" alt="Logo">
+        </div>
+    
+        <!-- Sidebar links with active highlighting -->
+        <a href="{% url 'it:department' %}" class="{% if request.resolver_match.url_name == 'department' %}active{% endif %}">
+            <i class="fas fa-building"></i> Department
         </a>
+        <a href="{% url 'it:bus' %}" class="{% if request.resolver_match.url_name == 'bus' %}active{% endif %}">
+            <i class="fas fa-bus"></i> Bus
+        </a>
+        <a href="{% url 'it:JO' %}" class="{% if request.resolver_match.url_name == 'JO' %}active{% endif %}">
+            <i class="fas fa-clipboard-list"></i> Job Order
+        </a>
+        <a href="{% url 'it:AR' %}" class="{% if request.resolver_match.url_name == 'AR' %}active{% endif %}">
+            <i class="fas fa-file-alt"></i> Acknowledgement Receipt
+        </a>
+        <a href="{% url 'it:purchase_odr' %}" class="{% if request.resolver_match.url_name == 'purchase_odr' %}active{% endif %}">
+            <i class="fas fa-file-invoice-dollar"></i> Purchase Order
+        </a>
+        <a href="{% url 'it:materials_it' %}" class="{% if request.resolver_match.url_name == 'materials_it' %}active{% endif %}">
+            <i class="fas fa-cogs"></i> Materials
+        </a>
+        <a href="{% url 'it:Accounts' %}" class="{% if request.resolver_match.url_name == 'Accounts' %}active{% endif %}">
+            <i class="fas fa-user-cog"></i> Accounts
+        </a>
+        
+    
+        <!-- Logout -->
+        <div class="logout">
+            <a id="logoutBtn" href="{% url 'it:logout' %}">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
     </div>
     
+    
+
     <div class="content">
         {% block content %}
         {% endblock %}
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- JavaScript to handle logout confirmation -->
     <script>
-        // Add event listener to the logout button
         document.getElementById('logoutBtn').addEventListener('click', function(event) {
-            // Show confirmation dialog
             const confirmLogout = confirm("Are you sure you want to log out?");
             if (!confirmLogout) {
-                event.preventDefault(); // Prevent the default action if the user cancels
+                event.preventDefault();
             } else {
-                // If confirmed, redirect to logout URL
-                window.location.href = "{% url 'it:logout' %}"; // Redirect to your logout URL
+                window.location.href = "{% url 'it:logout' %}";
             }
         });
-    
+
         // Prevent back button navigation after logout
         window.onload = function() {
             if (!document.referrer.includes(window.location.hostname)) {
                 history.replaceState(null, null, window.location.href);
                 window.history.pushState(null, "", window.location.href);
                 window.onpopstate = function() {
-                    history.go(1); // Prevent navigating back
+                    history.go(1);
                 };
             }
         };
