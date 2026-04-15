@@ -1,3 +1,11 @@
+System About
+
+
+
+
+
+
+
 Udotco System (How to start)
 
 TODO: check settings for database connection
@@ -16,4 +24,4 @@ TODO: check settings for database connection
 8. Create Accounts
 9. Finish
 
-    
+
